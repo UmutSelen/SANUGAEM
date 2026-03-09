@@ -65,8 +65,8 @@
             margin-top: 30px;
         }
         
-        /* Linklerin alt çizgisini kaldırmak için */
-        .game-link { text-decoration: none; color: inherit; }
+        /* Linklerin alt çizgisini kaldırmak ve rengi korumak için */
+        .game-link { text-decoration: none; color: inherit; display: block; }
 
         .game-card {
             background-color: var(--card-bg);
@@ -126,7 +126,7 @@
         <h2>Oyunlarımız</h2>
         <div class="games-grid">
             
-            <a href="#" class="phobia-official.netlify.app">
+            <a href="https://phobia-official.netlify.app" target="_blank" class="game-link">
                 <div class="game-card">
                     <div class="game-icon" style="background: url('phobia.jpeg') center/cover;"></div>
                     <h3>Phobia</h3>
@@ -134,7 +134,7 @@
                 </div>
             </a>
 
-            <a href="#" class="https://pharmos-official-tr.web.app/">
+            <a href="https://pharmos-official-tr.web.app/" target="_blank" class="game-link">
                 <div class="game-card">
                     <div class="game-icon" style="background: url('pharmos.png') center/cover;"></div>
                     <h3>Pharmos</h3>
@@ -142,7 +142,7 @@
                 </div>
             </a>
 
-            <a href="#" class="gezegen-merge.netlify.app">
+            <a href="https://gezegen-merge.netlify.app" target="_blank" class="game-link">
                 <div class="game-card">
                     <div class="game-icon" style="background: url('merge.png') center/cover;"></div>
                     <h3>Gezegen Mergesi</h3>
