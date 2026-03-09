@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Candy Match 3 - Efsanevi Sürüm</title>
+    <title>Candy Match 3 - Mega Yumak Eşleştirme</title>
     <style>
         /* TEMEL AYARLAR */
         body { 
@@ -116,7 +116,7 @@
             text-align: left; 
             z-index: 100; 
             max-width: 80%; 
-            width: 380px; 
+            width: 400px; 
             box-shadow: 0 0 30px #FF4081; 
         }
         
@@ -159,17 +159,20 @@
         <canvas id="gameCanvas" width="560" height="560"></canvas>
 
         <div id="helpModal">
-            <h2 style="color: #FF4081; text-align: center; margin-top: 0;">NASIL OYNANIR?</h2>
-            <p>👆 <strong>Kaydır:</strong> Şekerleri parmağınla tut ve yana kaydır.</p>
-            <p>💥 <strong>4'lü Eşleşme:</strong> Çevresini patlatan <b>Bomba Şeker</b> oluşturur!</p>
-            <p>🌈 <strong>5'li Eşleşme:</strong> O renkteki tüm şekerleri patlatan <b>Gökkuşağı Şekeri</b> oluşturur!</p>
+            <h2 style="color: #FF4081; text-align: center; margin-top: 0;">YENİ MEKANİKLER!</h2>
+            <p>👆 <strong>Kaydır:</strong> Şekerleri kaydırarak yerini değiştir.</p>
+            <p>💥 <strong>Yumak Eşleştirme:</strong> Yatay veya dikey bitişik aynı renkleri buluştur. En az 3 bitişik şeker bir "yumak" gibi birleşip patlar!</p>
+            <p>💣 <strong>4 Bitişik:</strong> Çevresini patlatan <b>Bomba Şeker</b> oluşturur!</p>
+            <p>🌈 <strong>5+ Bitişik:</strong> O renkteki tüm şekerleri patlatan <b>Gökkuşağı Şekeri</b> oluşturur!</p>
             <p>🛑 Hatalı hamle yaparsan şekerler geri seker!</p>
-            <button class="action-btn" onclick="toggleHelp()">Anladım, Patlat!</button>
+            <button class="action-btn" onclick="toggleHelp()">Yumağı Çöz!</button>
         </div>
     </div>
 
     <script>
-        // --- TİTREŞİM SİSTEMİ ---
+        // ==========================================
+        // 1. TİTREŞİM SİSTEMİ
+        // ==========================================
         let isVibrationEnabled = true;
 
         function triggerVibration(duration) {
@@ -181,7 +184,7 @@
         function toggleVibration() {
             isVibrationEnabled = !isVibrationEnabled;
             const btn = document.getElementById("vibBtn");
-            if(isVibrationEnabled) {
+            if (isVibrationEnabled) {
                 btn.innerText = "📳";
                 btn.style.color = "#FFF";
                 btn.style.borderColor = "#FF4081";
@@ -193,7 +196,9 @@
             }
         }
 
-        // --- 1. CANLI ARKA PLAN (UZAY) ---
+        // ==========================================
+        // 2. CANLI ARKA PLAN MOTORU (UZAY)
+        // ==========================================
         const bgCanvas = document.getElementById('universeCanvas');
         const bgCtx = bgCanvas.getContext('2d');
         
@@ -207,14 +212,29 @@
         const hour = new Date().getHours();
         let sky1, sky2;
         
-        if (hour >= 6 && hour < 10) { sky1 = "#FF7E5F"; sky2 = "#FEB47B"; } // Sabah
-        else if (hour >= 10 && hour < 17) { sky1 = "#4CA1AF"; sky2 = "#C4E0E5"; } // Öğle
-        else if (hour >= 17 && hour < 20) { sky1 = "#2c3e50"; sky2 = "#fd746c"; } // Akşam
-        else { sky1 = "#0f2027"; sky2 = "#203a43"; } // Gece
+        if (hour >= 6 && hour < 10) { 
+            sky1 = "#FF7E5F"; sky2 = "#FEB47B"; // Sabah
+        } else if (hour >= 10 && hour < 17) { 
+            sky1 = "#4CA1AF"; sky2 = "#C4E0E5"; // Öğle
+        } else if (hour >= 17 && hour < 20) { 
+            sky1 = "#2c3e50"; sky2 = "#fd746c"; // Akşamüstü
+        } else { 
+            sky1 = "#0f2027"; sky2 = "#203a43"; // Gece
+        }
 
-        const stars = [], meteors = [], shootingStars = [];
+        const stars = [];
+        const meteors = [];
+        const shootingStars = [];
+        
         if (hour >= 18 || hour < 6) { 
-            for(let i=0; i<100; i++) stars.push({x:Math.random()*2000, y:Math.random()*1000, s:Math.random()*2+1, a:Math.random()}); 
+            for (let i = 0; i < 100; i++) {
+                stars.push({
+                    x: Math.random() * 2000, 
+                    y: Math.random() * 1000, 
+                    s: Math.random() * 2 + 1, 
+                    a: Math.random()
+                }); 
+            }
         }
 
         function drawPixel(ctx, x, y, w, h, color) { 
@@ -246,32 +266,40 @@
                 bgCtx.fillRect(s.x, s.y, s.s, s.s); 
             });
 
-            if (Math.random() < 0.02) shootingStars.push({x: Math.random()*bgCanvas.width, y: 0, l: 30, sx: -8, sy: 8});
+            if (Math.random() < 0.02) {
+                shootingStars.push({x: Math.random() * bgCanvas.width, y: 0, l: 30, sx: -8, sy: 8});
+            }
             
             shootingStars.forEach((ss, i) => {
                 bgCtx.beginPath(); 
                 bgCtx.moveTo(ss.x, ss.y); 
-                bgCtx.lineTo(ss.x-ss.l, ss.y+ss.l); 
-                bgCtx.strokeStyle="white"; 
+                bgCtx.lineTo(ss.x - ss.l, ss.y + ss.l); 
+                bgCtx.strokeStyle = "white"; 
                 bgCtx.stroke();
-                ss.x += ss.sx; ss.y += ss.sy; 
-                if(ss.y > bgCanvas.height) shootingStars.splice(i,1);
+                ss.x += ss.sx; 
+                ss.y += ss.sy; 
+                if (ss.y > bgCanvas.height) shootingStars.splice(i, 1);
             });
 
-            if (Math.random() < 0.01) meteors.push({x: Math.random()*bgCanvas.width, y: -50, size: 5, sx: -2, sy: 4});
+            if (Math.random() < 0.01) {
+                meteors.push({x: Math.random() * bgCanvas.width, y: -50, size: 5, sx: -2, sy: 4});
+            }
             
             meteors.forEach((m, i) => {
                 drawPixel(bgCtx, m.x+5, m.y-10, m.size, m.size, "rgba(255,69,0,0.5)"); 
                 drawPixel(bgCtx, m.x, m.y, m.size, m.size, "#8B4513");
-                m.x += m.sx; m.y += m.sy; 
-                if(m.y > bgCanvas.height) meteors.splice(i,1);
+                m.x += m.sx; 
+                m.y += m.sy; 
+                if (m.y > bgCanvas.height) meteors.splice(i, 1);
             });
             
             requestAnimationFrame(animateBg);
         }
         animateBg();
 
-        // --- 2. CANDY MATCH 3 (ŞEKERLER VE OYUN MOTORU) ---
+        // ==========================================
+        // 3. CANDY MATCH 3 OYUN MOTORU
+        // ==========================================
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         
@@ -288,341 +316,330 @@
         let score = 0;
         let grid = [];
         let particles = [];
-        
-        // Animasyon ve Oyun Durumları
+        let firstClick = null;
         let gameState = "IDLE"; // IDLE, SWAPPING, REVERTING, DROPPING
         let animOffset = 0; 
-        let swapData = null; // {r1, c1, r2, c2, candy1, candy2}
+        let swapData = null; 
 
-        // Renkler ve Şekil İsimleri
-        const colors = [
-            { base: "#FF1744", light: "#FF8A80", type: "circle" }, 
-            { base: "#00E5FF", light: "#84FFFF", type: "flower" }, 
-            { base: "#FFEA00", light: "#FFFF8D", type: "triangle" },
-            { base: "#00E676", light: "#B9F6CA", type: "square" }, 
-            { base: "#D500F9", light: "#EA80FC", type: "circle" }, 
-            { base: "#212121", light: "#757575", type: "colorBomb" } // Gökkuşağı (Index 5)
+        // Referans resmindeki renkler ve şekiller
+        const refColors = [
+            { base: "#FF1744", light: "#FF8A80", type: "spiralJelly" }, // Kırmızı Sarmal
+            { base: "#00E676", light: "#B9F6CA", type: "swirlGreen" },  // Yeşil Girdap
+            { base: "#2962FF", light: "#82B1FF", type: "jelBean" },     // Mavi Fasulye
+            { base: "#FFEA00", light: "#FFFF8D", type: "star" },        // Sarı Yıldız
+            { base: "#FF6D00", light: "#FFD180", type: "triangle" },    // Turuncu Üçgen/Piramit
+            { base: "#D500F9", light: "#EA80FC", type: "heart" }        // Mor Kalp
         ];
 
-        // GÜVENLİ ÇİZİM FONKSİYONU: Hata vermeyen yuvarlak köşe çizici
-        function drawSafeRoundRect(ctx, x, y, w, h, r) {
-            ctx.beginPath();
-            ctx.moveTo(x + r, y);
-            ctx.lineTo(x + w - r, y);
-            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-            ctx.lineTo(x + w, y + h - r);
-            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-            ctx.lineTo(x + r, y + h);
-            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-            ctx.lineTo(x, y + r);
-            ctx.quadraticCurveTo(x, y, x + r, y);
-            ctx.closePath();
+        // Tarayıcı çökmelerini engellemek için güvenli çizim fonksiyonu
+        function drawSafeRoundRect(context, x, y, w, h, r) {
+            context.beginPath();
+            context.moveTo(x + r, y);
+            context.lineTo(x + w - r, y);
+            context.quadraticCurveTo(x + w, y, x + w, y + r);
+            context.lineTo(x + w, y + h - r);
+            context.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            context.lineTo(x + r, y + h);
+            context.quadraticCurveTo(x, y + h, x, y + h - r);
+            context.lineTo(x, y + r);
+            context.quadraticCurveTo(x, y, x + r, y);
+            context.closePath();
         }
 
-        // ŞEKER SINIFI
+        // ==========================================
+        // ŞEKER (CANDY) SINIFI
+        // ==========================================
         class Candy {
             constructor(r, c, colorIdx, isSpecial = "normal") {
                 this.r = r; 
                 this.c = c;
                 this.x = c * cellSize; 
                 this.y = r * cellSize;
+                this.targetY = r * cellSize; 
                 this.colorIdx = colorIdx;
                 this.isSpecial = isSpecial; // "normal", "bomb", "colorBomb"
             }
             
             updatePos() {
-                // Eğer oyun bekliyorsa (animasyon yoksa) şekeri tam yuvaya oturt
-                if(gameState === "IDLE") { 
+                // Pürüzsüz kayma animasyonu (Lerp)
+                this.y += (this.targetY - this.y) * 0.2; 
+                
+                if (gameState === "IDLE") { 
                     this.x = this.c * cellSize; 
-                    this.y = this.r * cellSize; 
+                    if (Math.abs(this.targetY - this.y) < 0.5) {
+                        this.y = this.targetY; 
+                    }
                 }
             }
             
             draw(isSelected) {
-                let px = this.x + cellSize/2; 
-                let py = this.y + cellSize/2; 
+                let px = this.x + cellSize / 2; 
+                let py = this.y + cellSize / 2; 
                 let r = 24;
-                let cInfo = colors[this.colorIdx];
+                let cInfo = refColors[this.colorIdx];
                 
+                if (!cInfo && this.isSpecial !== "colorBomb") return;
+
                 ctx.save(); 
                 ctx.translate(px, py);
                 
-                // Canlılık: Şekerlerin nefes alma animasyonu
+                // Canlılık: Nefes alma efekti
                 let time = Date.now();
-                let scale = 1 + Math.sin((time/200) + this.c + this.r) * 0.05;
-                if(isSelected) scale = 1.2; // Tıklanan şeker şişer
+                let scale = 1 + Math.sin((time / 200) + this.c + this.r) * 0.05;
+                
+                if (isSelected) {
+                    scale = 1.2;
+                }
+                
                 ctx.scale(scale, scale);
 
-                // Bomba Şekeri için Dış Parlama
-                if(this.isSpecial === "bomb") {
-                    ctx.shadowBlur = 15 + Math.sin(time/100)*5; 
+                // Bomba Şekeri için Parlama
+                if (this.isSpecial === "bomb") {
+                    ctx.shadowBlur = 15 + Math.sin(time / 100) * 5; 
                     ctx.shadowColor = "#FFF";
                     ctx.beginPath(); 
-                    ctx.arc(0, 0, r+6, 0, Math.PI*2); 
-                    ctx.fillStyle = "rgba(255,255,255,0.5)"; 
+                    ctx.arc(0, 0, r + 6, 0, Math.PI * 2); 
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.5)"; 
                     ctx.fill();
-                    ctx.shadowBlur = 0; // Kapat
+                    ctx.shadowBlur = 0; 
                 }
 
-                // Şekil Çizimi
-                if(this.isSpecial === "colorBomb") {
-                    // Gökkuşağı Şekeri (Siyah gövde, renkli noktalar)
-                    let grd = ctx.createRadialGradient(-r/3, -r/3, 2, 0, 0, r);
+                // Gökkuşağı Şekeri Çizimi
+                if (this.isSpecial === "colorBomb") {
+                    let grd = ctx.createRadialGradient(-r/3, -r/3, 2, 0, 0, r); 
                     grd.addColorStop(0, "#757575"); 
                     grd.addColorStop(1, "#212121");
+                    
                     ctx.fillStyle = grd; 
                     ctx.beginPath(); 
-                    ctx.arc(0, 0, r, 0, Math.PI*2); 
+                    ctx.arc(0, 0, r, 0, Math.PI * 2); 
                     ctx.fill();
                     
-                    // Renkli Noktalar
-                    for(let i=0; i<6; i++) {
-                        let angle = (i * Math.PI / 3) + time/1000;
-                        ctx.fillStyle = colors[i%5].base;
+                    for (let i = 0; i < 6; i++) {
+                        let angle = (i * Math.PI / 3) + time / 1000; 
+                        ctx.fillStyle = refColors[i % refColors.length].base;
                         ctx.beginPath(); 
-                        ctx.arc(Math.cos(angle)*12, Math.sin(angle)*12, 4, 0, Math.PI*2); 
+                        ctx.arc(Math.cos(angle) * 12, Math.sin(angle) * 12, 4, 0, Math.PI * 2); 
                         ctx.fill();
                     }
-                } else {
-                    // Normal ve Bomba Şekerlerin Renk Geçişi
-                    let grd = ctx.createRadialGradient(-r/3, -r/3, 2, 0, 0, r);
+                } 
+                // Normal Şeker Çizimleri
+                else {
+                    let grd = ctx.createRadialGradient(-r/3, -r/3, 2, 0, 0, r); 
                     grd.addColorStop(0, cInfo.light); 
-                    grd.addColorStop(1, cInfo.base);
+                    grd.addColorStop(1, cInfo.base); 
                     ctx.fillStyle = grd;
+                    
+                    if (cInfo.type === "spiralJelly") { 
+                        ctx.beginPath(); 
+                        ctx.arc(0, 0, r, 0, Math.PI * 2); 
+                        ctx.fill(); 
+                        ctx.strokeStyle = cInfo.light; 
+                        ctx.lineWidth = 3; 
+                        ctx.beginPath(); 
+                        ctx.moveTo(-15, -15); 
+                        ctx.lineTo(-10, -10); 
+                        ctx.lineTo(-5, -5); 
+                        ctx.lineTo(0, 0); 
+                        ctx.stroke(); 
+                    }
+                    else if (cInfo.type === "swirlGreen") { 
+                        ctx.beginPath(); 
+                        ctx.arc(0, 0, r, 0, Math.PI * 2); 
+                        ctx.fill(); 
+                        ctx.strokeStyle = "white"; 
+                        ctx.lineWidth = 3; 
+                        ctx.beginPath(); 
+                        ctx.moveTo(0, 0); 
+                        ctx.lineTo(15, 15); 
+                        ctx.stroke(); 
+                    }
+                    else if (cInfo.type === "jelBean") { 
+                        drawSafeRoundRect(ctx, -r/1.5, -r/2.5, r*1.2, r, 12); 
+                        ctx.fill(); 
+                    }
+                    else if (cInfo.type === "star") { 
+                        ctx.beginPath(); 
+                        ctx.moveTo(0, -r); 
+                        ctx.lineTo(r/2.5, -r/2.5); 
+                        ctx.lineTo(r, 0); 
+                        ctx.lineTo(r/2.5, r/2.5); 
+                        ctx.lineTo(0, r); 
+                        ctx.lineTo(-r/2.5, r/2.5); 
+                        ctx.lineTo(-r, 0); 
+                        ctx.lineTo(-r/2.5, -r/2.5); 
+                        ctx.closePath(); 
+                        ctx.fill(); 
+                    }
+                    else if (cInfo.type === "triangle") { 
+                        ctx.beginPath(); 
+                        ctx.moveTo(0, -r); 
+                        ctx.lineTo(r, r-5); 
+                        ctx.lineTo(-r, r-5); 
+                        ctx.closePath(); 
+                        ctx.fill(); 
+                    }
+                    else if (cInfo.type === "heart") { 
+                        ctx.beginPath(); 
+                        ctx.moveTo(0, r/1.5); 
+                        ctx.bezierCurveTo(-r, -r/2, -r/2, -r, 0, -r/3); 
+                        ctx.bezierCurveTo(r/2, -r, r, -r/2, 0, r/1.5); 
+                        ctx.closePath(); 
+                        ctx.fill(); 
+                    }
 
-                    // Şekiller (Tarayıcı çöktürmeyen güvenli çizimler)
-                    if(cInfo.type === "circle") { 
-                        ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.fill(); 
-                    }
-                    else if(cInfo.type === "square") { 
-                        drawSafeRoundRect(ctx, -r, -r, r*2, r*2, 10); ctx.fill(); 
-                    }
-                    else if(cInfo.type === "triangle") { 
-                        ctx.beginPath(); ctx.moveTo(0, -r-5); ctx.lineTo(r, r); ctx.lineTo(-r, r); ctx.closePath(); ctx.fill(); 
-                    }
-                    else if(cInfo.type === "flower") {
-                        ctx.beginPath(); ctx.arc(0, -8, 12, 0, Math.PI*2); ctx.fill();
-                        ctx.beginPath(); ctx.arc(0, 8, 12, 0, Math.PI*2); ctx.fill();
-                        ctx.beginPath(); ctx.arc(-8, 0, 12, 0, Math.PI*2); ctx.fill();
-                        ctx.beginPath(); ctx.arc(8, 0, 12, 0, Math.PI*2); ctx.fill();
-                        ctx.beginPath(); ctx.arc(0, 0, 10, 0, Math.PI*2); ctx.fill(); // Merkez
-                    }
-
-                    // Yüz İfadesi Çizimi
+                    // Sevimli Yüz İfadesi
                     ctx.fillStyle = "#2c3e50"; 
-                    ctx.beginPath(); ctx.arc(-6, -2, 3, 0, Math.PI*2); ctx.fill(); 
-                    ctx.beginPath(); ctx.arc(6, -2, 3, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); 
+                    ctx.arc(-6, -2, 3, 0, Math.PI * 2); 
+                    ctx.fill(); 
+                    ctx.beginPath(); 
+                    ctx.arc(6, -2, 3, 0, Math.PI * 2); 
+                    ctx.fill();
                     
                     ctx.fillStyle = "white"; 
-                    ctx.beginPath(); ctx.arc(-7, -3, 1.5, 0, Math.PI*2); ctx.fill(); 
-                    ctx.beginPath(); ctx.arc(5, -3, 1.5, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); 
+                    ctx.arc(-7, -3, 1.5, 0, Math.PI * 2); 
+                    ctx.fill(); 
+                    ctx.beginPath(); 
+                    ctx.arc(5, -3, 1.5, 0, Math.PI * 2); 
+                    ctx.fill();
                     
-                    if(this.isSpecial === "bomb") {
-                        // Bomba Surat: Düz çizgi (Kararlı)
-                        ctx.strokeStyle = "#2c3e50"; ctx.lineWidth = 2; 
-                        ctx.beginPath(); ctx.moveTo(-4, 4); ctx.lineTo(4, 4); ctx.stroke();
-                    } else {
-                        // Normal Surat: Gülümseme
-                        ctx.strokeStyle = "#2c3e50"; ctx.lineWidth = 2; 
-                        ctx.beginPath(); ctx.arc(0, 4, 5, 0.2, Math.PI-0.2); ctx.stroke();
+                    if (this.isSpecial === "bomb") { 
+                        ctx.strokeStyle = "#2c3e50"; 
+                        ctx.lineWidth = 2; 
+                        ctx.beginPath(); 
+                        ctx.moveTo(-4, 4); 
+                        ctx.lineTo(4, 4); 
+                        ctx.stroke(); 
+                    } else { 
+                        ctx.strokeStyle = "#2c3e50"; 
+                        ctx.lineWidth = 2; 
+                        ctx.beginPath(); 
+                        ctx.arc(0, 4, 5, 0.2, Math.PI - 0.2); 
+                        ctx.stroke(); 
                     }
                 }
                 ctx.restore();
             }
         }
 
-        // --- BAŞLANGIÇ IZGARASINI OLUŞTURMA ---
+        // ==========================================
+        // OYUN İŞLEVLERİ VE MANTIK
+        // ==========================================
+
         function createGrid() { 
-            for (let r=0; r<gridSize; r++) { 
+            for (let r = 0; r < gridSize; r++) { 
                 grid[r] = []; 
-                for (let c=0; c<gridSize; c++) {
-                    grid[r][c] = new Candy(r, c, Math.floor(Math.random()*5)); 
+                for (let c = 0; c < gridSize; c++) {
+                    grid[r][c] = new Candy(r, c, Math.floor(Math.random() * refColors.length)); 
                 }
             } 
-            // Başlangıçta eşleşme olmasın diye temizle
-            while(checkMatches().length > 0) {
-                for (let r=0; r<gridSize; r++) { 
-                    for (let c=0; c<gridSize; c++) {
-                        grid[r][c].colorIdx = Math.floor(Math.random()*5);
-                    }
-                }
-            }
-        }
-
-        // --- ANA OYUN ÇİZİM VE ANİMASYON DÖNGÜSÜ ---
-        function animateGame() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Arkadaki Slotlar
-            for(let r=0; r<gridSize; r++) {
-                for(let c=0; c<gridSize; c++) {
-                    ctx.fillStyle = (r+c)%2===0 ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.15)";
-                    drawSafeRoundRect(ctx, c*cellSize+2, r*cellSize+2, cellSize-4, cellSize-4, 10);
-                    ctx.fill();
-                }
-            }
-
-            // SWAP (KAYDIRMA) ve REVERT (GERİ SEKME) ANİMASYONU
-            if(gameState === "SWAPPING" || gameState === "REVERTING") {
-                animOffset += 0.15; // Kaydırma hızı
-                if(animOffset >= 1) {
-                    animOffset = 0;
-                    if(gameState === "SWAPPING") {
-                        if(checkMatches().length > 0) {
-                            gameState = "DROPPING"; 
-                            solveMatches();
-                        } else {
-                            // EŞLEŞME YOK! Geri Sekme Animasyonunu Başlat
-                            gameState = "REVERTING";
-                            triggerVibration(50); // Hatalı hamle titremesi
-                            
-                            // Grid'deki yerleri tekrar geri al
-                            let temp = grid[swapData.r1][swapData.c1];
-                            grid[swapData.r1][swapData.c1] = grid[swapData.r2][swapData.c2];
-                            grid[swapData.r2][swapData.c2] = temp;
-                            
-                            grid[swapData.r1][swapData.c1].r = swapData.r1; grid[swapData.r1][swapData.c1].c = swapData.c1;
-                            grid[swapData.r2][swapData.c2].r = swapData.r2; grid[swapData.r2][swapData.c2].c = swapData.c2;
-                        }
-                    } else if(gameState === "REVERTING") {
-                        // Geri sekme bitti, oynamaya devam
-                        gameState = "IDLE";
-                        swapData = null;
-                    }
-                } else {
-                    // Şekerlerin kayarkenki koordinatlarını güncelle (Lerp)
-                    let c1 = swapData.candy1; 
-                    let c2 = swapData.candy2;
-                    
-                    let targetX1 = c1.c * cellSize; let targetY1 = c1.r * cellSize;
-                    let targetX2 = c2.c * cellSize; let targetY2 = c2.r * cellSize;
-                    
-                    if(gameState === "REVERTING") {
-                        targetX1 = swapData.c1 * cellSize; targetY1 = swapData.r1 * cellSize;
-                        targetX2 = swapData.c2 * cellSize; targetY2 = swapData.r2 * cellSize;
-                    }
-
-                    c1.x += (targetX1 - c1.x) * 0.3; 
-                    c1.y += (targetY1 - c1.y) * 0.3;
-                    c2.x += (targetX2 - c2.x) * 0.3; 
-                    c2.y += (targetY2 - c2.y) * 0.3;
-                }
-            }
-
-            // Şekerleri Çiz
-            for(let r=0; r<gridSize; r++) {
-                for(let c=0; c<gridSize; c++) {
-                    if (grid[r][c]) {
-                        grid[r][c].updatePos();
-                        let selected = (firstClick && firstClick.r === r && firstClick.c === c);
-                        grid[r][c].draw(selected);
+            // Başlangıçta hazır eşleşme olmasın diye temizle
+            while (checkMatches().length > 0) { 
+                for (let r = 0; r < gridSize; r++) {
+                    for (let c = 0; c < gridSize; c++) {
+                        grid[r][c].colorIdx = Math.floor(Math.random() * refColors.length); 
                     }
                 }
             }
-
-            // Patlama Parçacıkları Çizimi
-            for(let i=0; i<particles.length; i++) {
-                let p = particles[i]; 
-                p.x += p.vx; 
-                p.y += p.vy; 
-                p.life -= 0.03;
-                
-                ctx.globalAlpha = Math.max(0, p.life); 
-                ctx.fillStyle = p.color;
-                ctx.beginPath(); 
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); 
-                ctx.fill(); 
-                ctx.globalAlpha = 1;
-                
-                if(p.life <= 0) particles.splice(i, 1);
-            }
-            requestAnimationFrame(animateGame);
         }
 
-        // --- PATLAMA VE OYUN MANTIĞI ---
+        // --- YUMAK (BLOK) EŞLEŞTİRME SİSTEMİ (BFS Algoritması) ---
+        function checkMatches() { 
+            let matches = []; 
+            let visited = [];
+            
+            for (let r = 0; r < gridSize; r++) {
+                visited[r] = new Array(gridSize).fill(false);
+            }
+
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    if (grid[r][c] && !visited[r][c] && grid[r][c].isSpecial !== "colorBomb") {
+                        let colorIdx = grid[r][c].colorIdx;
+                        let group = [];
+                        let stack = [{r: r, c: c}];
+                        
+                        // Birbirine bağlı aynı renkleri bul (Köşeler hariç, sağ/sol/alt/üst)
+                        while (stack.length > 0) {
+                            let curr = stack.pop();
+                            let cr = curr.r;
+                            let cc = curr.c;
+                            
+                            // Sınır ve durum kontrolleri
+                            if (cr < 0 || cr >= gridSize || cc < 0 || cc >= gridSize) continue;
+                            if (visited[cr][cc]) continue;
+                            if (!grid[cr][cc] || grid[cr][cc].colorIdx !== colorIdx) continue;
+                            
+                            visited[cr][cc] = true;
+                            group.push({r: cr, c: cc});
+                            
+                            // Komşuları yığına ekle
+                            stack.push({r: cr + 1, c: cc}); // Aşağı
+                            stack.push({r: cr - 1, c: cc}); // Yukarı
+                            stack.push({r: cr, c: cc + 1}); // Sağ
+                            stack.push({r: cr, c: cc - 1}); // Sol
+                        }
+                        
+                        // Eğer bu bağlı yumak en az 3 parçadan oluşuyorsa patlatılacaklara ekle
+                        if (group.length >= 3) {
+                            matches.push(group);
+                        }
+                    }
+                }
+            }
+            return matches; 
+        }
+
+        function dropCandies() { 
+            for (let c = 0; c < gridSize; c++) { 
+                let k = gridSize - 1; 
+                
+                // Mevcut şekerleri aşağı kaydır
+                for (let r = gridSize - 1; r >= 0; r--) {
+                    if (grid[r][c] !== null) { 
+                        grid[k][c] = grid[r][c]; 
+                        grid[k][c].r = k; 
+                        grid[k][c].targetY = k * cellSize; 
+                        k--; 
+                    } 
+                }
+                
+                // Boşalan üst kısımlara yeni şekerler üret
+                for (let r = k; r >= 0; r--) {
+                    grid[r][c] = new Candy(r, c, Math.floor(Math.random() * refColors.length));
+                    grid[r][c].y = -cellSize - (gridSize - r) * cellSize; // Ekranın dışından düşecek
+                    grid[r][c].targetY = r * cellSize;
+                } 
+            } 
+            gameState = "DROPPING"; 
+        }
+
         function createExplosion(c, r, colorIdx, isBig = false) {
-            let px = c * cellSize + cellSize/2; 
-            let py = r * cellSize + cellSize/2;
+            let px = c * cellSize + cellSize / 2; 
+            let py = r * cellSize + cellSize / 2;
             let count = isBig ? 30 : 12; 
             let speed = isBig ? 25 : 15;
-            let particleColor = colorIdx === 5 ? "#FFF" : colors[colorIdx].base;
             
-            for(let i=0; i<count; i++) { 
+            for (let i = 0; i < count; i++) {
                 particles.push({ 
-                    x: px, y: py, 
-                    vx: (Math.random()-0.5)*speed, 
-                    vy: (Math.random()-0.5)*speed, 
+                    x: px, 
+                    y: py, 
+                    vx: (Math.random() - 0.5) * speed, 
+                    vy: (Math.random() - 0.5) * speed, 
                     life: 1, 
-                    size: Math.random()*6+3, 
-                    color: particleColor 
+                    size: Math.random() * 6 + 3, 
+                    color: colorIdx === 5 ? "#FFF" : refColors[colorIdx].base 
                 }); 
             }
         }
 
-        function checkMatches() { 
-            let matchGroups = [];
-
-            // Yatay Kontrol
-            for(let r=0; r<gridSize; r++) {
-                let matchLen = 1;
-                for(let c=0; c<gridSize; c++) {
-                    let check = false;
-                    if(c < gridSize-1 && grid[r][c] && grid[r][c+1] && grid[r][c].colorIdx === grid[r][c+1].colorIdx && grid[r][c].isSpecial !== "colorBomb") {
-                        matchLen++; check = true;
-                    }
-                    if(!check || c === gridSize-2) {
-                        if(matchLen >= 3) {
-                            let group = [];
-                            for(let i=0; i<matchLen; i++) { group.push({r: r, c: c - (check ? matchLen-2 : matchLen-1) + i}); }
-                            matchGroups.push(group);
-                        }
-                        matchLen = 1;
-                    }
-                }
-            }
-
-            // Dikey Kontrol
-            for(let c=0; c<gridSize; c++) {
-                let matchLen = 1;
-                for(let r=0; r<gridSize; r++) {
-                    let check = false;
-                    if(r < gridSize-1 && grid[r][c] && grid[r+1][c] && grid[r][c].colorIdx === grid[r+1][c].colorIdx && grid[r][c].isSpecial !== "colorBomb") {
-                        matchLen++; check = true;
-                    }
-                    if(!check || r === gridSize-2) {
-                        if(matchLen >= 3) {
-                            let group = [];
-                            for(let i=0; i<matchLen; i++) { group.push({r: r - (check ? matchLen-2 : matchLen-1) + i, c: c}); }
-                            matchGroups.push(group);
-                        }
-                        matchLen = 1;
-                    }
-                }
-            }
-            return matchGroups; 
-        }
-
-        function dropCandies() { 
-            for(let c=0; c<gridSize; c++) { 
-                let k=gridSize-1; 
-                for(let r=gridSize-1; r>=0; r--) {
-                    if(grid[r][c] !== null) { 
-                        grid[k][c] = grid[r][c]; 
-                        grid[k][c].r = k; 
-                        k--; 
-                    } 
-                }
-                // Boşluklara ekranın üstünden yeni şeker düşür
-                for(let r=k; r>=0; r--) {
-                    grid[r][c] = new Candy(r, c, Math.floor(Math.random()*5));
-                    grid[r][c].y = -cellSize; 
-                } 
-            } 
-        }
-
         async function solveMatches() {
             let matchGroups;
-            while((matchGroups = checkMatches()).length > 0) {
+            
+            while ((matchGroups = checkMatches()).length > 0) {
                 let toDestroy = new Set();
                 let newSpecials = []; 
 
@@ -633,130 +650,260 @@
 
                     group.forEach(item => {
                         let candy = grid[item.r][item.c];
-                        if(candy) {
+                        if (candy) {
                             toDestroy.add(`${item.r},${item.c}`);
                             
                             let isSwapOrigin = (swapData && ((item.r === swapData.r1 && item.c === swapData.c1) || (item.r === swapData.r2 && item.c === swapData.c2)));
                             
-                            // Yeni özel şekerleri belirle
-                            if(!specialCreated && (isSwapOrigin || (!swapData && item === group[0]))) {
-                                if(isMatch5) { newSpecials.push({r: item.r, c: item.c, type: "colorBomb", color: 5}); specialCreated = true; }
-                                else if(isMatch4) { newSpecials.push({r: item.r, c: item.c, type: "bomb", color: candy.colorIdx}); specialCreated = true; }
+                            // Özel şeker oluşturma (Bomba veya Gökkuşağı)
+                            if (!specialCreated && (isSwapOrigin || (!swapData && item === group[0]))) {
+                                if (isMatch5) { 
+                                    newSpecials.push({r: item.r, c: item.c, type: "colorBomb", color: 5}); 
+                                    specialCreated = true; 
+                                }
+                                else if (isMatch4) { 
+                                    newSpecials.push({r: item.r, c: item.c, type: "bomb", color: candy.colorIdx}); 
+                                    specialCreated = true; 
+                                }
                             }
 
-                            // Patlayan bomba ise, etrafını da ekle
-                            if(candy.isSpecial === "bomb") {
-                                for(let br = -1; br <= 1; br++) {
-                                    for(let bc = -1; bc <= 1; bc++) {
-                                        if(item.r+br >= 0 && item.r+br < gridSize && item.c+bc >= 0 && item.c+bc < gridSize) {
-                                            toDestroy.add(`${item.r+br},${item.c+bc}`);
+                            // Eğer patlayan şeker Bomba ise etrafını da patlat
+                            if (candy.isSpecial === "bomb") {
+                                for (let br = -1; br <= 1; br++) {
+                                    for (let bc = -1; bc <= 1; bc++) {
+                                        if (item.r + br >= 0 && item.r + br < gridSize && item.c + bc >= 0 && item.c + bc < gridSize) {
+                                            toDestroy.add(`${item.r + br},${item.c + bc}`);
                                         }
                                     }
                                 }
-                                triggerVibration(300); // Bomba patlama titreşimi
+                                triggerVibration(300); 
                             }
                         }
                     });
                 });
 
-                // Belirlenen alanları patlat
                 let destroyedCount = 0;
+                
                 Array.from(toDestroy).forEach(coord => {
                     let [r, c] = coord.split(',').map(Number);
-                    if(grid[r][c]) {
-                        createExplosion(c, r, grid[r][c].colorIdx, grid[r][c].isSpecial === "bomb");
-                        grid[r][c] = null;
-                        destroyedCount++;
+                    if (grid[r][c]) { 
+                        createExplosion(c, r, grid[r][c].colorIdx, grid[r][c].isSpecial === "bomb"); 
+                        grid[r][c] = null; 
+                        destroyedCount++; 
                     }
                 });
 
-                score += destroyedCount * 10;
-                document.getElementById("score").innerText = score;
+                score += destroyedCount * 10; 
+                document.getElementById("score").innerText = score; 
                 triggerVibration(150); 
-
-                // Yeni Özel Şekerleri Yerleştir
+                
+                // Yeni oluşan özel şekerleri ızgaraya yerleştir
                 newSpecials.forEach(spec => {
                     grid[spec.r][spec.c] = new Candy(spec.r, spec.c, spec.color, spec.type);
                 });
 
-                await new Promise(res => setTimeout(res, 350));
-                dropCandies();
-                await new Promise(res => setTimeout(res, 350));
+                // Patlama ve düşme beklemeleri
+                await new Promise(res => setTimeout(res, 350)); 
+                dropCandies(); 
+                
+                while (gameState === "DROPPING") {
+                    await new Promise(res => requestAnimationFrame(res)); 
+                }
+                await new Promise(res => setTimeout(res, 100)); 
             }
-            gameState = "IDLE";
+            
+            gameState = "IDLE"; 
             swapData = null;
         }
 
-        // 5'Lİ GÖKKUŞAĞI ŞEKERİ PATLAMA MANTIĞI
         async function triggerColorBomb(bombR, bombC, targetColorIdx) {
-            gameState = "DROPPING";
+            gameState = "DROPPING"; 
             triggerVibration(400); 
-            createExplosion(bombC, bombR, 5, true);
+            
+            createExplosion(bombC, bombR, 5, true); 
             grid[bombR][bombC] = null;
-
-            for(let r=0; r<gridSize; r++) {
-                for(let c=0; c<gridSize; c++) {
-                    if(grid[r][c] && grid[r][c].colorIdx === targetColorIdx) {
-                        createExplosion(c, r, targetColorIdx);
-                        grid[r][c] = null;
-                        score += 20;
+            
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    if (grid[r][c] && grid[r][c].colorIdx === targetColorIdx) { 
+                        createExplosion(c, r, targetColorIdx); 
+                        grid[r][c] = null; 
+                        score += 20; 
                     }
                 }
             }
+            
             document.getElementById("score").innerText = score;
-            await new Promise(res => setTimeout(res, 300));
-            dropCandies();
-            await new Promise(res => setTimeout(res, 300));
+            
+            await new Promise(res => setTimeout(res, 300)); 
+            dropCandies(); 
+            
+            while (gameState === "DROPPING") {
+                await new Promise(res => requestAnimationFrame(res));
+            }
+            
+            await new Promise(res => setTimeout(res, 100)); 
             solveMatches(); 
         }
 
-        // --- KONTROLLER (SÜRÜKLE / SWIPE) ---
+        // ==========================================
+        // ANA OYUN DÖNGÜSÜ
+        // ==========================================
+        function animateGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Arka plan slotlarını çiz
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    ctx.fillStyle = (r + c) % 2 === 0 ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.15)";
+                    drawSafeRoundRect(ctx, c * cellSize + 2, r * cellSize + 2, cellSize - 4, cellSize - 4, 10); 
+                    ctx.fill();
+                }
+            }
+
+            // Kaydırma (Swap) ve Geri Sekme (Revert) Animasyonları
+            if (gameState === "SWAPPING" || gameState === "REVERTING") {
+                animOffset += 0.15; 
+                
+                if (animOffset >= 1) {
+                    animOffset = 0;
+                    if (gameState === "SWAPPING") {
+                        if (checkMatches().length > 0) {
+                            gameState = "DROPPING"; 
+                            solveMatches();
+                        } else {
+                            // Eşleşme yoksa geri sektir
+                            gameState = "REVERTING"; 
+                            triggerVibration(50); 
+                            
+                            let temp = grid[swapData.r1][swapData.c1];
+                            grid[swapData.r1][swapData.c1] = grid[swapData.r2][swapData.c2];
+                            grid[swapData.r2][swapData.c2] = temp;
+                            
+                            grid[swapData.r1][swapData.c1].r = swapData.r1; 
+                            grid[swapData.r1][swapData.c1].c = swapData.c1;
+                            
+                            grid[swapData.r2][swapData.c2].r = swapData.r2; 
+                            grid[swapData.r2][swapData.c2].c = swapData.c2;
+                            
+                            grid[swapData.r1][swapData.c1].targetY = swapData.r1 * cellSize;
+                            grid[swapData.r2][swapData.c2].targetY = swapData.r2 * cellSize;
+                        }
+                    } else if (gameState === "REVERTING") {
+                        gameState = "IDLE";
+                        swapData = null;
+                    }
+                } else {
+                    // Kayma sırasında pozisyonları hesapla
+                    let c1 = swapData.candy1; 
+                    let c2 = swapData.candy2;
+                    let targetX1 = c1.c * cellSize; 
+                    let targetY1 = c1.r * cellSize;
+                    let targetX2 = c2.c * cellSize; 
+                    let targetY2 = c2.r * cellSize;
+                    
+                    if (gameState === "REVERTING") {
+                        targetX1 = swapData.c1 * cellSize; 
+                        targetY1 = swapData.r1 * cellSize;
+                        targetX2 = swapData.c2 * cellSize; 
+                        targetY2 = swapData.r2 * cellSize;
+                    }
+                    
+                    c1.x += (targetX1 - c1.x) * 0.3; 
+                    c1.y += (targetY1 - c1.y) * 0.3;
+                    c2.x += (targetX2 - c2.x) * 0.3; 
+                    c2.y += (targetY2 - c2.y) * 0.3;
+                }
+            }
+
+            // Şekerleri Çiz ve Düşme Durumunu Kontrol Et
+            let allSettled = true; 
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    if (grid[r][c]) {
+                        grid[r][c].updatePos();
+                        let selected = (firstClick && firstClick.r === r && firstClick.c === c);
+                        grid[r][c].draw(selected);
+                        
+                        if (gameState === "DROPPING" && Math.abs(grid[r][c].targetY - grid[r][c].y) > 0.5) {
+                            allSettled = false;
+                        }
+                    }
+                }
+            }
+            
+            // Eğer tüm düşmeler tamamlandıysa bekleme moduna geç
+            if (gameState === "DROPPING" && allSettled) {
+                gameState = "IDLE";
+            }
+
+            // Patlama Parçacıklarını Çiz
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i]; 
+                p.x += p.vx; 
+                p.y += p.vy; 
+                p.life -= 0.03;
+                
+                ctx.globalAlpha = Math.max(0, p.life); 
+                ctx.fillStyle = p.color;
+                ctx.beginPath(); 
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); 
+                ctx.fill(); 
+                ctx.globalAlpha = 1;
+                
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+            
+            requestAnimationFrame(animateGame);
+        }
+
+        // ==========================================
+        // KONTROLLER (Sürükle / Kaydır / Tıkla)
+        // ==========================================
         let startX = 0, startY = 0, isDragging = false;
-        let firstClick = null;
 
         canvas.addEventListener("pointerdown", e => { 
-            if(gameState !== "IDLE") return; 
+            if (gameState !== "IDLE") return; 
+            
             const rect = canvas.getBoundingClientRect(); 
             const scaleX = canvas.width / rect.width; 
             const scaleY = canvas.height / rect.height;
             
             startX = (e.clientX - rect.left) * scaleX; 
-            startY = (e.clientY - rect.top) * scaleY;
+            startY = (e.clientY - rect.top) * scaleY; 
             isDragging = true;
-
+            
             const c = Math.floor(startX / cellSize); 
             const r = Math.floor(startY / cellSize); 
             firstClick = {r, c}; 
         });
 
         canvas.addEventListener("pointermove", e => {
-            if(!isDragging || gameState !== "IDLE" || !firstClick) return;
+            if (!isDragging || gameState !== "IDLE" || !firstClick) return;
+            
             const rect = canvas.getBoundingClientRect(); 
             const scaleX = canvas.width / rect.width; 
             const scaleY = canvas.height / rect.height;
             
-            let currentX = (e.clientX - rect.left) * scaleX;
+            let currentX = (e.clientX - rect.left) * scaleX; 
             let currentY = (e.clientY - rect.top) * scaleY;
-
-            let diffX = currentX - startX;
+            
+            let diffX = currentX - startX; 
             let diffY = currentY - startY;
 
-            // Kaydırma (Swipe) Hassasiyeti
-            if(Math.abs(diffX) > cellSize/3 || Math.abs(diffY) > cellSize/3) {
-                isDragging = false;
-                
-                let targetR = firstClick.r;
+            // Eğer belirli bir mesafeden fazla kaydırıldıysa yönü belirle ve yer değiştir
+            if (Math.abs(diffX) > cellSize / 3 || Math.abs(diffY) > cellSize / 3) {
+                isDragging = false; 
+                let targetR = firstClick.r; 
                 let targetC = firstClick.c;
-
-                // Yön bulma
-                if(Math.abs(diffX) > Math.abs(diffY)) {
+                
+                if (Math.abs(diffX) > Math.abs(diffY)) {
                     targetC += diffX > 0 ? 1 : -1; 
                 } else {
                     targetR += diffY > 0 ? 1 : -1; 
                 }
-
-                // Hedef geçerli ise değişimi başlat
-                if(targetR >= 0 && targetR < gridSize && targetC >= 0 && targetC < gridSize) {
+                
+                if (targetR >= 0 && targetR < gridSize && targetC >= 0 && targetC < gridSize) {
                     initiateSwap(firstClick.r, firstClick.c, targetR, targetC);
                 }
                 firstClick = null;
@@ -764,15 +911,16 @@
         });
 
         canvas.addEventListener("pointerup", e => {
-            if(isDragging && firstClick && gameState === "IDLE") {
+            if (isDragging && firstClick && gameState === "IDLE") {
                 const rect = canvas.getBoundingClientRect(); 
                 const scaleX = canvas.width / rect.width; 
                 const scaleY = canvas.height / rect.height;
+                
                 const c = Math.floor(((e.clientX - rect.left) * scaleX) / cellSize); 
                 const r = Math.floor(((e.clientY - rect.top) * scaleY) / cellSize);
-
-                if(firstClick.r !== r || firstClick.c !== c) {
-                    if(Math.abs(firstClick.r - r) + Math.abs(firstClick.c - c) === 1) {
+                
+                if (firstClick.r !== r || firstClick.c !== c) {
+                    if (Math.abs(firstClick.r - r) + Math.abs(firstClick.c - c) === 1) {
                         initiateSwap(firstClick.r, firstClick.c, r, c);
                     }
                     firstClick = null;
@@ -785,35 +933,47 @@
             let candy1 = grid[r1][c1]; 
             let candy2 = grid[r2][c2];
             
-            if(candy1.isSpecial === "colorBomb" || candy2.isSpecial === "colorBomb") {
-                let bombCandy = candy1.isSpecial === "colorBomb" ? candy1 : candy2;
+            if (candy1.isSpecial === "colorBomb" || candy2.isSpecial === "colorBomb") {
+                let bombCandy = candy1.isSpecial === "colorBomb" ? candy1 : candy2; 
                 let targetCandy = candy1.isSpecial === "colorBomb" ? candy2 : candy1;
-                triggerColorBomb(bombCandy.r, bombCandy.c, targetCandy.colorIdx);
-                firstClick = null;
+                triggerColorBomb(bombCandy.r, bombCandy.c, targetCandy.colorIdx); 
+                firstClick = null; 
                 return;
             }
-
-            gameState = "SWAPPING";
-            animOffset = 0;
+            
+            gameState = "SWAPPING"; 
+            animOffset = 0; 
             swapData = {r1, c1, r2, c2, candy1, candy2};
-
+            
             grid[r1][c1] = candy2; 
-            grid[r2][c2] = candy1;
-            candy1.r = r2; candy1.c = c2;
-            candy2.r = r1; candy2.c = c1;
+            grid[r2][c2] = candy1; 
+            
+            candy1.r = r2; 
+            candy1.c = c2; 
+            candy2.r = r1; 
+            candy2.c = c1;
+            
+            candy1.targetY = r2 * cellSize; 
+            candy2.targetY = r1 * cellSize;
         }
 
-        // --- ARAYÜZ ---
+        // ==========================================
+        // ARAYÜZ (UI)
+        // ==========================================
         function toggleFullScreen() { 
-            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(err => console.log(err)); 
-            else document.exitFullscreen(); 
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err)); 
+            } else { 
+                document.exitFullscreen(); 
+            } 
         }
+        
         function toggleHelp() { 
             const modal = document.getElementById("helpModal"); 
             modal.style.display = modal.style.display === "block" ? "none" : "block"; 
         }
 
-        // Başlat
+        // Oyunu Başlat
         createGrid(); 
         animateGame();
     </script>
