@@ -3,65 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosmic Run - Sanu Game Company</title>
+    <title>Cosmic Run - Piksel Macera</title>
     <style>
-        body { margin: 0; overflow: hidden; background-color: #08080a; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-        canvas { background: radial-gradient(circle, #1a1a2e 0%, #0a0a12 100%); border-bottom: 5px solid #4CAF50; box-shadow: 0 10px 40px rgba(76, 175, 80, 0.3); border-radius: 10px 10px 0 0; }
-        #ui { position: absolute; top: 20px; width: 800px; display: flex; justify-content: space-between; font-size: 26px; font-weight: bold; text-shadow: 0 0 10px #4CAF50; }
-        #gameOverScreen { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(15, 15, 19, 0.96); padding: 50px; border-radius: 20px; border: 3px solid #4CAF50; text-align: center; box-shadow: 0 0 50px rgba(76, 175, 80, 0.6); z-index: 100; }
-        button { background-color: #4CAF50; color: white; border: none; padding: 18px 35px; font-size: 20px; font-weight: bold; cursor: pointer; border-radius: 10px; margin-top: 25px; transition: 0.3s; box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); }
-        button:hover { background-color: #45a049; transform: scale(1.05); box-shadow: 0 0 25px rgba(76, 175, 80, 0.8); }
-        .back-link { display: block; margin-top: 20px; color: #888; text-decoration: none; font-size: 16px; }
-        .back-link:hover { color: white; text-decoration: underline; }
+        body { margin: 0; overflow: hidden; background-color: #08080a; color: white; font-family: 'Segoe UI', sans-serif; }
+        #gameArea { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        canvas { background: linear-gradient(#0f2027, #203a43); box-shadow: 0 0 30px #4CAF50; max-width: 100%; max-height: 100%; }
+        
+        /* UI Butonları */
+        .top-ui { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; z-index: 10; pointer-events: none; }
+        .score-board { font-size: 24px; font-weight: bold; text-shadow: 2px 2px 0 #000; pointer-events: auto; }
+        .controls { display: flex; gap: 15px; pointer-events: auto; }
+        .icon-btn { background: rgba(0,0,0,0.5); border: 2px solid #4CAF50; color: #4CAF50; width: 45px; height: 45px; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .icon-btn:hover { background: #4CAF50; color: black; }
+
+        /* Modal (Nasıl Oynanır) */
+        #helpModal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); border: 3px solid #4CAF50; padding: 30px; border-radius: 15px; text-align: center; z-index: 100; max-width: 80%; }
+        #gameOverScreen { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); border: 3px solid #FF5722; padding: 40px; border-radius: 15px; text-align: center; z-index: 100; }
+        button.action-btn { background: #4CAF50; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; margin-top: 20px; }
+        .back-link { display: block; margin-top: 15px; color: #aaa; text-decoration: none; }
     </style>
 </head>
 <body>
-    <div id="ui">
-        <div>Skor: <span id="score">0</span></div>
-        <div>En Yüksek: <span id="highScore">0</span></div>
+    <div id="gameArea">
+        <div class="top-ui">
+            <div class="score-board">Skor: <span id="score">0</span> | Max: <span id="highScore">0</span></div>
+            <div class="controls">
+                <button class="icon-btn" onclick="toggleHelp()">?</button>
+                <button class="icon-btn" onclick="toggleFullScreen()">⛶</button>
+            </div>
+        </div>
+
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+        <div id="helpModal">
+            <h2 style="color: #4CAF50;">NASIL OYNANIR?</h2>
+            <p><strong>PC:</strong> BOŞLUK (Space) veya YUKARI OK tuşu ile zıpla.</p>
+            <p><strong>Mobil/Tablet:</strong> Ekrana dokunarak zıpla.</p>
+            <p>Kızıl göktaşlarına çarpmadan en uzun süre hayatta kal!</p>
+            <button class="action-btn" onclick="toggleHelp()">Anladım</button>
+        </div>
+
+        <div id="gameOverScreen">
+            <h1 style="color: #FF5722;">PARÇALANDIN!</h1>
+            <p>Skorun: <span id="finalScore">0</span></p>
+            <button class="action-btn" onclick="resetGame()">Yeniden Doğ</button>
+            <a href="index.html" class="back-link">← Üsse Dön</a>
+        </div>
     </div>
-    <canvas id="gameCanvas" width="800" height="400"></canvas>
-    <div id="gameOverScreen">
-        <h1 style="color: #FF5722; margin-top: 0; font-size: 40px; letter-spacing: 2px;">KOZMİK ÇARPIŞMA!</h1>
-        <p style="font-size: 24px;">Skorun: <span id="finalScore">0</span></p>
-        <button onclick="resetGame()">Tekrar Atıl (Space)</button>
-        <a href="index.html" class="back-link">← Üsse Dön (Ana Sayfa)</a>
-    </div>
+
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
-        let frames = 0; let score = 0; let highScore = localStorage.getItem("sanuCosmicScore") || 0; let gameActive = true; let gameSpeed = 6;
+        
+        // Responsive Canvas
+        function resizeCanvas() {
+            const aspect = 800 / 400;
+            if(window.innerWidth / window.innerHeight < aspect) {
+                canvas.style.width = window.innerWidth * 0.95 + "px";
+                canvas.style.height = (window.innerWidth * 0.95 / aspect) + "px";
+            } else {
+                canvas.style.height = window.innerHeight * 0.8 + "px";
+                canvas.style.width = (window.innerHeight * 0.8 * aspect) + "px";
+            }
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let frames = 0, score = 0, highScore = localStorage.getItem("sanuCosmic") || 0, gameActive = true, gameSpeed = 5;
         document.getElementById("highScore").innerText = highScore;
 
-        // --- Arka Plan Objeleri (Kodlarla Çizim) ---
-        const stars = []; const planets = []; const ships = []; const jets = [];
-        for (let i = 0; i < 50; i++) stars.push({ x: Math.random() * 800, y: Math.random() * 400, size: Math.random() * 2, speed: Math.random() * 0.5 + 0.1 });
-        planets.push({ x: 900, y: 80, r: 40, color: "#4B0082", speed: 0.3 }, { x: 1200, y: 250, r: 25, color: "#FFD700", speed: 0.2 });
-        ships.push({ x: 850, y: 150, w: 60, h: 20, color: "#C0C0C0", speed: 1.5 });
-        jets.push({ x: 950, y: 300, w: 40, h: 10, color: "#4169E1", speed: 2.5 });
+        // Piksel Çizim Fonksiyonu
+        function dRect(x,y,w,h,c) { ctx.fillStyle = c; ctx.fillRect(Math.floor(x),Math.floor(y),w,h); }
 
-        function drawBackground() {
-            ctx.fillStyle = "#1a1a2e"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            stars.forEach(s => { ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill(); s.x -= s.speed; if (s.x < 0) s.x = 800; });
-            planets.forEach(p => { ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 10; ctx.shadowColor = p.color; ctx.fill(); ctx.shadowBlur = 0; p.x -= p.speed; if (p.x + p.r < 0) p.x = 900; });
-            ships.forEach(sh => { ctx.fillStyle = sh.color; ctx.fillRect(sh.x, sh.y, sh.w, sh.h); sh.x -= sh.speed; if (sh.x + sh.w < 0) sh.x = 850; });
-            jets.forEach(j => { ctx.fillStyle = j.color; ctx.fillRect(j.x, j.y, j.w, j.h); j.x -= j.speed; if (j.x + j.w < 0) j.x = 950; });
-        }
+        // Oyuncu ve Animasyon Parçacıkları
+        let particles = [];
+        const player = {
+            x: 60, y: 300, w: 40, h: 40, dy: 0, gravity: 0.8, jumpPower: -14, grounded: false,
+            draw: function() {
+                // Piksel Astronot
+                dRect(this.x+10, this.y, 20, 20, "white"); // Kask
+                dRect(this.x+15, this.y+5, 15, 10, "#40C4FF"); // Vizör
+                dRect(this.x+5, this.y+20, 30, 20, "#4CAF50"); // Gövde (Yeşil Sanu Teması)
+                // Ateş (Zıplıyorsa)
+                if(!this.grounded) {
+                    dRect(this.x+10, this.y+40, 5, Math.random()*15, "orange");
+                    dRect(this.x+25, this.y+40, 5, Math.random()*15, "orange");
+                }
+            },
+            update: function() {
+                this.dy += this.gravity; this.y += this.dy;
+                if(this.y + this.h >= 380) { this.y = 380 - this.h; this.dy = 0; this.grounded = true; } 
+                else { this.grounded = false; }
+            },
+            jump: function() { if(this.grounded) this.dy = this.jumpPower; }
+        };
 
-        // --- Oyun Mekanikleri ---
-        const player = { x: 60, y: 300, width: 40, height: 40, dy: 0, gravity: 0.7, jumpPower: -13, grounded: false, draw: function() { ctx.fillStyle = "#4CAF50"; ctx.shadowBlur = 20; ctx.shadowColor = "#4CAF50"; ctx.fillRect(this.x, this.y, this.width, this.height); ctx.shadowBlur = 0; }, update: function() { this.dy += this.gravity; this.y += this.dy; if (this.y + this.height >= 400) { this.y = 400 - this.height; this.dy = 0; this.grounded = true; } else { this.grounded = false; } }, jump: function() { if (this.grounded) this.dy = this.jumpPower; } };
         const obstacles = [];
         function handleObstacles() {
-            if (frames % 90 === 0) { let obsH = Math.random() * 50 + 30; obstacles.push({ x: 800, y: 400 - obsH, w: 35, h: obsH }); }
-            obstacles.forEach((obs, i) => { obs.x -= gameSpeed; ctx.fillStyle = "#FF5722"; ctx.shadowBlur = 10; ctx.shadowColor = "#FF5722"; ctx.fillRect(obs.x, obs.y, obs.w, obs.h); ctx.shadowBlur = 0; if (player.x < obs.x + obs.w && player.x + player.width > obs.x && player.y < obs.y + obs.h && player.y + player.height > obs.y) gameOver(); if (obs.x + obs.w < 0) { obstacles.splice(i, 1); score += 10; document.getElementById("score").innerText = score; if (score % 60 === 0) gameSpeed += 0.6; } });
+            if (frames % 100 === 0) obstacles.push({ x: 800, y: 380 - (Math.random()*40+30), w: 30, h: Math.random()*40+30 });
+            for (let i = 0; i < obstacles.length; i++) {
+                let obs = obstacles[i]; obs.x -= gameSpeed;
+                // Piksel Düşman (Kızıl Kristal)
+                dRect(obs.x, obs.y, obs.w, obs.h, "#FF5722");
+                dRect(obs.x+5, obs.y+5, obs.w-10, obs.h-10, "#FF8A65"); // Parlama detayı
+
+                // Çarpışma
+                if(player.x < obs.x+obs.w && player.x+player.w > obs.x && player.y < obs.y+obs.h && player.y+player.h > obs.y) createExplosion();
+                
+                if(obs.x + obs.w < 0) { obstacles.splice(i, 1); score+=10; document.getElementById("score").innerText = score; if(score%50===0) gameSpeed+=0.5; }
+            }
         }
 
-        function gameOver() { gameActive = false; document.getElementById("gameOverScreen").style.display = "block"; document.getElementById("finalScore").innerText = score; if (score > highScore) { highScore = score; localStorage.setItem("sanuCosmicScore", highScore); document.getElementById("highScore").innerText = highScore; } }
-        function resetGame() { obstacles.length = 0; score = 0; frames = 0; gameSpeed = 6; player.y = 300; document.getElementById("score").innerText = score; document.getElementById("gameOverScreen").style.display = "none"; gameActive = true; animate(); }
-        window.addEventListener("keydown", e => { if (e.code === "Space" || e.code === "ArrowUp") { if (gameActive) player.jump(); else resetGame(); } });
-        window.addEventListener("mousedown", () => { if (gameActive) player.jump(); });
+        // Vurulma Animasyonu (Piksellerin Dağılması)
+        function createExplosion() {
+            gameActive = false;
+            for(let i=0; i<30; i++) particles.push({ x: player.x+20, y: player.y+20, vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10, life: 1.0, color: ["#4CAF50", "white", "#FF5722"][Math.floor(Math.random()*3)] });
+        }
 
-        function animate() { if (!gameActive) return; ctx.clearRect(0, 0, canvas.width, canvas.height); drawBackground(); player.update(); player.draw(); handleObstacles(); frames++; requestAnimationFrame(animate); }
+        function drawParticles() {
+            for(let i=0; i<particles.length; i++) {
+                let p = particles[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.02;
+                ctx.globalAlpha = Math.max(0, p.life); dRect(p.x, p.y, 5, 5, p.color); ctx.globalAlpha = 1;
+                if(p.life <= 0) particles.splice(i,1);
+            }
+            if(!gameActive && particles.length === 0) {
+                document.getElementById("gameOverScreen").style.display = "block";
+                document.getElementById("finalScore").innerText = score;
+                if(score > highScore) { highScore = score; localStorage.setItem("sanuCosmic", highScore); document.getElementById("highScore").innerText = highScore; }
+            }
+        }
+
+        function drawZemin() { dRect(0, 380, 800, 20, "#2c3e50"); dRect(0, 385, 800, 5, "#34495e"); }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawZemin();
+            if(gameActive) { player.update(); player.draw(); handleObstacles(); frames++; }
+            else { drawParticles(); }
+            requestAnimationFrame(animate);
+        }
+
+        // Kontroller
+        window.addEventListener("keydown", e => { if(e.code==="Space"||e.code==="ArrowUp") { if(gameActive) player.jump(); else if(particles.length===0) resetGame(); } });
+        window.addEventListener("touchstart", () => { if(gameActive) player.jump(); else if(particles.length===0) resetGame(); });
+
+        function resetGame() { obstacles.length = 0; particles = 0; particles = []; score = 0; frames = 0; gameSpeed = 5; player.y = 300; player.dy = 0; document.getElementById("score").innerText = score; document.getElementById("gameOverScreen").style.display = "none"; gameActive = true; }
+
+        // UI Fonksiyonları
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(err => console.log(err));
+            else document.exitFullscreen();
+        }
+        function toggleHelp() {
+            const modal = document.getElementById("helpModal");
+            modal.style.display = modal.style.display === "block" ? "none" : "block";
+        }
+
         animate();
     </script>
 </body>
