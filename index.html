@@ -48,8 +48,7 @@
             margin: 0 auto 20px;
             width: 150px;
             height: 150px;
-            /* Hermes asası ve yılanlar için görsel buraya gelecek */
-            background: url('snake') center/cover;
+            background: url('sanu_logo.png') center/cover; /* Kendi logonu buraya koyarsın */
             border-radius: 50%;
             box-shadow: 0 0 20px var(--accent-color);
         }
@@ -65,6 +64,10 @@
             flex-wrap: wrap;
             margin-top: 30px;
         }
+        
+        /* Linklerin alt çizgisini kaldırmak için */
+        .game-link { text-decoration: none; color: inherit; }
+
         .game-card {
             background-color: var(--card-bg);
             padding: 20px;
@@ -83,7 +86,6 @@
             margin: 0 auto 15px;
             background-color: #333;
             border-radius: 20px;
-            /* Phobia vb. iconlar için */
         }
         .game-card h3 { margin: 0; color: var(--accent-color); }
 
@@ -124,23 +126,37 @@
         <h2>Oyunlarımız</h2>
         <div class="games-grid">
             
-            <div class="game-card">
-                <div class="game-icon" style="background: url('phobia.jpeg') center/cover;"></div>
-                <h3>Phobia</h3>
-                <p>Korkularınla yüzleş.</p>
-            </div>
+            <a href="#" class="game-link">
+                <div class="game-card">
+                    <div class="game-icon" style="background: url('phobia.jpeg') center/cover;"></div>
+                    <h3>Phobia</h3>
+                    <p>Korkularınla yüzleş.</p>
+                </div>
+            </a>
 
-            <div class="game-card">
-                <div class="game-icon" style="background: url('pharmos.png') center/cover;"></div>
-                <h3>Pharmos</h3>
-                <p>Yeni bir macera.</p>
-            </div>
+            <a href="#" class="game-link">
+                <div class="game-card">
+                    <div class="game-icon" style="background: url('pharmos.png') center/cover;"></div>
+                    <h3>Pharmos</h3>
+                    <p>Yeni bir macera.</p>
+                </div>
+            </a>
 
-            <div class="game-card">
-                <div class="game-icon" style="background: url('merge.png') center/cover;"></div>
-                <h3>Gezegen Mergesi</h3>
-                <p>Evreni birleştir!</p>
-            </div>
+            <a href="#" class="game-link">
+                <div class="game-card">
+                    <div class="game-icon" style="background: url('merge.png') center/cover;"></div>
+                    <h3>Gezegen Mergesi</h3>
+                    <p>Evreni birleştir!</p>
+                </div>
+            </a>
+
+            <a href="infinity.html" class="game-link">
+                <div class="game-card">
+                    <div class="game-icon" style="background: url('infinity.png') center/cover;"></div>
+                    <h3>Infinity Run</h3>
+                    <p>En yüksek skoru yap!</p>
+                </div>
+            </a>
 
         </div>
     </section>
@@ -151,7 +167,7 @@
             <p><strong>Kurucu & Geliştirici:</strong> Umut Selen</p>
             <p><strong>Kuruluş Yılı:</strong> 2025</p>
             <p><strong>Ekip Sayısı:</strong> 1 (Tek Kişilik Dev Kadro)</p>
-            <p><strong>Vizyonumuz:</strong> Çift yılanlı asamızın gücüyle Pharmos (Şifa) ve Sanos (Akıl) kavramlarını birleştirip unutulmaz oyun deneyimleri yaratmak.</p>
+            <p><strong>Vizyonumuz:</strong> Asklepios asasının gücüyle Pharmos (Şifa) ve Sanos (Akıl) kavramlarını birleştirip unutulmaz oyun deneyimleri yaratmak.</p>
         </div>
     </section>
 
