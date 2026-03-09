@@ -3,56 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Candy Match 3 - Sanu Game Company</title>
+    <title>Candy Match 3 - Piksel Patlatma</title>
     <style>
-        body { margin: 0; background-color: #0f0f13; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        #gameArea { display: flex; gap: 30px; align-items: flex-start; }
-        canvas { background-color: #1c1c24; border: 3px solid #FF4081; border-radius: 15px; box-shadow: 0 0 30px rgba(255, 64, 129, 0.3); cursor: pointer; }
-        #ui { background-color: #1c1c24; padding: 25px; border-radius: 15px; border: 2px solid #FF4081; text-align: center; width: 180px; }
-        .score-box { font-size: 28px; font-weight: bold; color: #FF4081; text-shadow: 0 0 10px #FF4081; margin-bottom: 20px; }
-        .back-link { display: block; margin-top: 30px; color: #888; text-decoration: none; font-size: 16px; }
+        body { margin: 0; overflow: hidden; background-color: #08080a; color: white; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Canlı Arka Plan */
+        #universeCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; }
+        
+        #gameArea { position: relative; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        
+        /* Oyun Tahtası */
+        #gameCanvas { background: rgba(28, 28, 36, 0.85); box-shadow: 0 0 40px rgba(255, 64, 129, 0.6); border: 4px solid #FF4081; border-radius: 15px; max-width: 95vmin; max-height: 95vmin; cursor: pointer; backdrop-filter: blur(5px); }
+        
+        /* UI Butonları */
+        .top-ui { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; z-index: 10; pointer-events: none; }
+        .score-board { font-size: 26px; font-weight: bold; text-shadow: 2px 2px 4px #000; pointer-events: auto; color: #FF4081; }
+        .controls { display: flex; gap: 15px; pointer-events: auto; }
+        .icon-btn { background: rgba(0,0,0,0.6); border: 2px solid #FF4081; color: #FF4081; width: 45px; height: 45px; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .icon-btn:hover { background: #FF4081; color: white; }
+
+        /* Modallar */
+        #helpModal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.95); border: 3px solid #FF4081; padding: 30px; border-radius: 15px; text-align: center; z-index: 100; max-width: 80%; width: 350px; }
+        button.action-btn { background: #FF4081; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 8px; cursor: pointer; margin-top: 20px; font-weight: bold; }
+        .back-link { display: block; margin-top: 15px; color: #ccc; text-decoration: none; pointer-events: auto; }
         .back-link:hover { color: white; text-decoration: underline; }
     </style>
 </head>
 <body>
+
+    <canvas id="universeCanvas"></canvas>
+
     <div id="gameArea">
+        <div class="top-ui">
+            <div class="score-board">Skor: <span id="score">0</span></div>
+            <div class="controls">
+                <a href="index.html" class="icon-btn" style="display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:16px;">🏠</a>
+                <button class="icon-btn" onclick="toggleHelp()">?</button>
+                <button class="icon-btn" onclick="toggleFullScreen()">⛶</button>
+            </div>
+        </div>
+
         <canvas id="gameCanvas" width="560" height="560"></canvas>
-        <div id="ui">
-            <div class="score-box">Skor: <span id="score">0</span></div>
-            <p style="font-size: 14px; color: #aaa;">En yüksek skorunuz kaydedilir.</p>
-            <a href="index.html" class="back-link">← Üsse Dön (Ana Sayfa)</a>
+
+        <div id="helpModal">
+            <h2 style="color: #FF4081;">NASIL OYNANIR?</h2>
+            <p>1. Bir şekere tıkla (veya dokun).</p>
+            <p>2. Yanındaki bir şekere tıklayarak yerlerini değiştir.</p>
+            <p>3. Aynı renkten en az 3 şekeri yan yana getir ve patlat!</p>
+            <button class="action-btn" onclick="toggleHelp()">Hadi Patlatalım!</button>
         </div>
     </div>
+
     <script>
-        const canvas = document.getElementById("gameCanvas"); const ctx = canvas.getContext("2d");
-        const gridSize = 8; const cellSize = 70; let score = 0; let grid = [];
-        let firstClick = null; let movesActive = true;
+        // --- 1. CANLI ARKA PLAN MOTORU ---
+        const bgCanvas = document.getElementById('universeCanvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        function resizeBg() { bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeBg); resizeBg();
+
+        const hour = new Date().getHours();
+        let sky1, sky2;
+        if (hour >= 6 && hour < 10) { sky1 = "#FF7E5F"; sky2 = "#FEB47B"; } 
+        else if (hour >= 10 && hour < 17) { sky1 = "#4CA1AF"; sky2 = "#C4E0E5"; } 
+        else if (hour >= 17 && hour < 20) { sky1 = "#2c3e50"; sky2 = "#fd746c"; } 
+        else { sky1 = "#0f2027"; sky2 = "#203a43"; }
+
+        const stars = [], meteors = [], shootingStars = [];
+        if (hour >= 18 || hour < 6) { for(let i=0; i<100; i++) stars.push({x:Math.random()*2000, y:Math.random()*1000, s:Math.random()*2+1, a:Math.random()}); }
+
+        function drawPixel(ctx, x, y, w, h, color) { ctx.fillStyle = color; ctx.fillRect(Math.floor(x), Math.floor(y), w, h); }
+
+        function animateBg() {
+            let grd = bgCtx.createLinearGradient(0, 0, 0, bgCanvas.height);
+            grd.addColorStop(0, sky1); grd.addColorStop(1, sky2);
+            bgCtx.fillStyle = grd; bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+            // Güneş / Ay Çizimi
+            const cx = bgCanvas.width - 100, cy = 80;
+            if (hour >= 6 && hour < 17) {
+                drawPixel(bgCtx, cx-20, cy-30, 40, 60, "#FFD700"); drawPixel(bgCtx, cx-30, cy-20, 60, 40, "#FFD700");
+            } else {
+                drawPixel(bgCtx, cx-20, cy-30, 40, 60, "#DDDDDD"); drawPixel(bgCtx, cx-10, cy-20, 30, 40, sky1); 
+            }
+
+            stars.forEach(s => { s.a += 0.05; bgCtx.fillStyle = `rgba(255,255,255,${Math.abs(Math.sin(s.a))})`; bgCtx.fillRect(s.x, s.y, s.s, s.s); });
+
+            if (Math.random() < 0.02) shootingStars.push({x: Math.random()*bgCanvas.width, y: 0, l: 30, sx: -8, sy: 8});
+            shootingStars.forEach((ss, i) => {
+                bgCtx.beginPath(); bgCtx.moveTo(ss.x, ss.y); bgCtx.lineTo(ss.x-ss.l, ss.y+ss.l); bgCtx.strokeStyle="white"; bgCtx.stroke();
+                ss.x += ss.sx; ss.y += ss.sy; if(ss.y > bgCanvas.height) shootingStars.splice(i,1);
+            });
+
+            if (Math.random() < 0.01) meteors.push({x: Math.random()*bgCanvas.width, y: -50, size: 5, sx: -2, sy: 4});
+            meteors.forEach((m, i) => {
+                drawPixel(bgCtx, m.x+5, m.y-10, m.size, m.size, "rgba(255,69,0,0.5)"); drawPixel(bgCtx, m.x, m.y, m.size, m.size, "#8B4513");
+                m.x += m.sx; m.y += m.sy; if(m.y > bgCanvas.height) meteors.splice(i,1);
+            });
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+
+        // --- 2. CANDY MATCH 3 OYUN MOTORU (Piksel Şekerler & Patlama Animasyonu) ---
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
         
-        // --- Renkler/Şekiller (Kodla Çizim) ---
-        const colors = ["#FF5252", "#FF4081", "#7C4DFF", "#536DFE", "#40C4FF", "#18FFFF"]; // Kırmızı, Pembe, Mor, Mavi, Turkuaz, Cyan
-        function drawCandy(ctx, colorIndex, x, y) {
-            ctx.fillStyle = colors[colorIndex]; ctx.shadowBlur = 5; ctx.shadowColor = colors[colorIndex];
-            switch (colorIndex) {
-                case 0: ctx.fillRect(x + 15, y + 15, 40, 40); break; // Kare
-                case 1: ctx.beginPath(); ctx.arc(x + 35, y + 35, 20, 0, Math.PI * 2); ctx.fill(); break; // Daire
-                case 2: ctx.beginPath(); ctx.moveTo(x+35, y+15); ctx.lineTo(x+55, y+55); ctx.lineTo(x+15, y+55); ctx.closePath(); ctx.fill(); break; // Üçgen
-                case 3: ctx.fillRect(x + 10, y + 25, 50, 20); break; // Yatay Çubuk
-                case 4: ctx.beginPath(); ctx.arc(x + 35, y + 35, 18, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); break; // Halka
-                case 5: ctx.fillRect(x + 25, y + 10, 20, 50); break; // Dikey Çubuk
-            } ctx.shadowBlur = 0;
+        // Responsive Canvas Ayarı
+        function resizeGame() {
+            let size = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.7);
+            canvas.style.width = size + "px";
+            canvas.style.height = size + "px";
+        }
+        window.addEventListener('resize', resizeGame); resizeGame();
+
+        const gridSize = 8, cellSize = 70;
+        let score = 0, grid = [], particles = [], firstClick = null, movesActive = true;
+        
+        const colors = ["#FF5252", "#FF4081", "#7C4DFF", "#40C4FF", "#69F0AE"];
+
+        // Piksel Şeker Çizici
+        function drawCandy(x, y, colorIdx, isSelected) {
+            let c = colors[colorIdx];
+            let px = x + cellSize/2; let py = y + cellSize/2;
+            
+            if (isSelected) {
+                ctx.fillStyle = "rgba(255,255,255,0.3)";
+                ctx.fillRect(x, y, cellSize, cellSize);
+            }
+
+            // Pikselize şekiller
+            ctx.fillStyle = c;
+            if (colorIdx === 0) { ctx.fillRect(px-20, py-20, 40, 40); ctx.fillStyle="#fff"; ctx.fillRect(px-10, py-10, 10, 10); } // Kare
+            else if (colorIdx === 1) { ctx.fillRect(px-15, py-25, 30, 50); ctx.fillStyle="#fff"; ctx.fillRect(px-5, py-15, 10, 20); } // Dikey
+            else if (colorIdx === 2) { ctx.fillRect(px-25, py-15, 50, 30); ctx.fillStyle="#fff"; ctx.fillRect(px-15, py-5, 20, 10); } // Yatay
+            else if (colorIdx === 3) { ctx.fillRect(px-20, py-20, 40, 40); ctx.clearRect(px-10, py-10, 20, 20); } // Halka
+            else { ctx.fillRect(px-25, py-25, 20, 20); ctx.fillRect(px+5, py+5, 20, 20); ctx.fillRect(px-25, py+5, 20, 20); ctx.fillRect(px+5, py-25, 20, 20); } // Çapraz
         }
 
-        function createGrid() { for (let r = 0; r < gridSize; r++) { grid[r] = []; for (let c = 0; c < gridSize; c++) grid[r][c] = Math.floor(Math.random() * colors.length); } checkAndFixMatches(); }
-        function drawGrid() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let r = 0; r < gridSize; r++) for (let c = 0; c < gridSize; c++) if (grid[r][c] !== null) drawCandy(ctx, grid[r][c], c * cellSize, r * cellSize); }
-        function checkAndFixMatches() { while(true){ let m=checkMatches(); if(m.length>0){ score+=m.length*10; m.forEach(id=>grid[Math.floor(id/gridSize)][id%gridSize]=Math.floor(Math.random()*colors.length)); }else break; } score=0; }
-        function checkMatches() { let m=[]; for(let r=0; r<gridSize; r++) for(let c=0; c<gridSize-2; c++) if(grid[r][c]===grid[r][c+1]&&grid[r][c]===grid[r][c+2]) m.push(r*gridSize+c, r*gridSize+c+1, r*gridSize+c+2); for(let c=0; c<gridSize; c++) for(let r=0; r<gridSize-2; r++) if(grid[r][c]===grid[r+1][c]&&grid[r][c]===grid[r+2][c]) m.push(r*gridSize+c, (r+1)*gridSize+c, (r+2)*gridSize+c); return [...new Set(m)]; }
-        function dropCandies() { for(let c=0; c<gridSize; c++){ let k=gridSize-1; for(let r=gridSize-1; r>=0; r--) if(grid[r][c]!==null){ grid[k][c]=grid[r][c]; k--; } for(let r=k; r>=0; r--) grid[r][c]=null; } for(let c=0; c<gridSize; c++) for(let r=0; r<gridSize; r++) if(grid[r][c]===null) grid[r][c]=Math.floor(Math.random()*colors.length); }
+        function createGrid() { for (let r=0; r<gridSize; r++) { grid[r] = []; for (let c=0; c<gridSize; c++) grid[r][c] = Math.floor(Math.random()*colors.length); } checkAndFix(); }
         
-        async function solveMatches() { let m; while((m=checkMatches()).length>0){ score+=m.length*10; document.getElementById("score").innerText=score; m.forEach(id=>grid[Math.floor(id/gridSize)][id%gridSize]=null); drawGrid(); await new Promise(r=>setTimeout(r, 200)); dropCandies(); drawGrid(); await new Promise(r=>setTimeout(r, 200)); } movesActive=true; }
+        // Oyun Döngüsü (Sürekli Render - Animasyonlar için)
+        function animateGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Arka plan grid slotlarını çiz
+            for(let r=0; r<gridSize; r++) {
+                for(let c=0; c<gridSize; c++) {
+                    ctx.fillStyle = (r+c)%2===0 ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.1)";
+                    ctx.fillRect(c*cellSize, r*cellSize, cellSize, cellSize);
+                    
+                    if (grid[r][c] !== null) {
+                        let selected = (firstClick && firstClick.r === r && firstClick.c === c);
+                        drawCandy(c*cellSize, r*cellSize, grid[r][c], selected);
+                    }
+                }
+            }
+
+            // Patlama Parçacıkları (Animasyon)
+            for(let i=0; i<particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx; p.y += p.vy; p.life -= 0.05;
+                ctx.globalAlpha = Math.max(0, p.life);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, 8, 8);
+                ctx.globalAlpha = 1;
+                if(p.life <= 0) particles.splice(i, 1);
+            }
+
+            requestAnimationFrame(animateGame);
+        }
+
+        // Patlama efekti oluşturucu
+        function createExplosion(c, r, colorIdx) {
+            let px = c*cellSize + cellSize/2; let py = r*cellSize + cellSize/2;
+            for(let i=0; i<10; i++) {
+                particles.push({ x: px, y: py, vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15, life: 1, color: colors[colorIdx] });
+            }
+        }
+
+        function checkMatches() { let m=[]; for(let r=0; r<gridSize; r++) for(let c=0; c<gridSize-2; c++) if(grid[r][c]!==null && grid[r][c]===grid[r][c+1]&&grid[r][c]===grid[r][c+2]) m.push(r*gridSize+c, r*gridSize+c+1, r*gridSize+c+2); for(let c=0; c<gridSize; c++) for(let r=0; r<gridSize-2; r++) if(grid[r][c]!==null && grid[r][c]===grid[r+1][c]&&grid[r][c]===grid[r+2][c]) m.push(r*gridSize+c, (r+1)*gridSize+c, (r+2)*gridSize+c); return [...new Set(m)]; }
+        function checkAndFix() { while(true){ let m=checkMatches(); if(m.length>0){ m.forEach(id=>grid[Math.floor(id/gridSize)][id%gridSize]=Math.floor(Math.random()*colors.length)); }else break; } }
         
-        canvas.addEventListener("mousedown", async e => { if(!movesActive) return; const c=Math.floor((e.clientX-canvas.getBoundingClientRect().left)/cellSize); const r=Math.floor((e.clientY-canvas.getBoundingClientRect().top)/cellSize); if(!firstClick) firstClick={r,c}; else{ if(Math.abs(firstClick.r-r)+Math.abs(firstClick.c-c)===1){ movesActive=false; [grid[r][c],grid[firstClick.r][firstClick.c]]=[grid[firstClick.r][firstClick.c],grid[r][c]]; drawGrid(); if(checkMatches().length===0){ [grid[r][c],grid[firstClick.r][firstClick.c]]=[grid[firstClick.r][firstClick.c],grid[r][c]]; drawGrid(); movesActive=true; }else await solveMatches(); } firstClick=null; } });
+        function dropCandies() { 
+            for(let c=0; c<gridSize; c++){ let k=gridSize-1; for(let r=gridSize-1; r>=0; r--) if(grid[r][c]!==null){ grid[k][c]=grid[r][c]; k--; } for(let r=k; r>=0; r--) grid[r][c]=null; } 
+            for(let c=0; c<gridSize; c++) for(let r=0; r<gridSize; r++) if(grid[r][c]===null) grid[r][c]=Math.floor(Math.random()*colors.length); 
+        }
         
-        createGrid(); drawGrid();
+        async function solveMatches() { 
+            let m; 
+            while((m=checkMatches()).length>0){ 
+                score+=m.length*10; document.getElementById("score").innerText=score; 
+                m.forEach(id=>{ 
+                    let r = Math.floor(id/gridSize); let c = id%gridSize;
+                    createExplosion(c, r, grid[r][c]); // Patlama animasyonunu tetikle
+                    grid[r][c]=null; 
+                }); 
+                await new Promise(r=>setTimeout(r, 300)); // Bekleme efekti
+                dropCandies(); 
+                await new Promise(r=>setTimeout(r, 200)); 
+            } 
+            movesActive=true; 
+        }
+        
+        canvas.addEventListener("pointerdown", async e => { 
+            if(!movesActive) return; 
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width; const scaleY = canvas.height / rect.height;
+            const c=Math.floor(((e.clientX-rect.left)*scaleX)/cellSize); 
+            const r=Math.floor(((e.clientY-rect.top)*scaleY)/cellSize); 
+            
+            if(!firstClick) { firstClick={r,c}; } 
+            else { 
+                if(Math.abs(firstClick.r-r)+Math.abs(firstClick.c-c)===1){ 
+                    movesActive=false; 
+                    [grid[r][c],grid[firstClick.r][firstClick.c]]=[grid[firstClick.r][firstClick.c],grid[r][c]]; 
+                    
+                    if(checkMatches().length===0){ 
+                        // Eşleşme yoksa geri al
+                        setTimeout(() => {
+                            [grid[r][c],grid[firstClick.r][firstClick.c]]=[grid[firstClick.r][firstClick.c],grid[r][c]]; 
+                            movesActive=true; 
+                        }, 200);
+                    } else { await solveMatches(); } 
+                } 
+                firstClick=null; 
+            } 
+        });
+
+        // UI Butonları
+        function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+        function toggleHelp() { const modal = document.getElementById("helpModal"); modal.style.display = modal.style.display === "block" ? "none" : "block"; }
+
+        createGrid(); 
+        animateGame();
     </script>
 </body>
 </html>
