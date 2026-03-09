@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candy Match 3 - Sanu Game Company</title>
+    <style>
+        body { margin: 0; background-color: #0f0f13; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        #gameArea { display: flex; gap: 30px; align-items: flex-start; }
+        canvas { background-color: #1c1c24; border: 3px solid #FF4081; border-radius: 15px; box-shadow: 0 0 30px rgba(255, 64, 129, 0.3); cursor: pointer; }
+        #ui { background-color: #1c1c24; padding: 25px; border-radius: 15px; border: 2px solid #FF4081; text-align: center; width: 180px; }
+        .score-box { font-size: 28px; font-weight: bold; color: #FF4081; text-shadow: 0 0 10px #FF4081; margin-bottom: 20px; }
+        .back-link { display: block; margin-top: 30px; color: #888; text-decoration: none; font-size: 16px; }
+        .back-link:hover { color: white; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div id="gameArea">
+        <canvas id="gameCanvas" width="560" height="560"></canvas>
+        <div id="ui">
+            <div class="score-box">Skor: <span id="score">0</span></div>
+            <p style="font-size: 14px; color: #aaa;">En yüksek skorunuz kaydedilir.</p>
+            <a href="index.html" class="back-link">← Üsse Dön (Ana Sayfa)</a>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById("gameCanvas"); const ctx = canvas.getContext("2d");
+        const gridSize = 8; const cellSize = 70; let score = 0; let grid = [];
+        let firstClick = null; let movesActive = true;
+        
+        // --- Renkler/Şekiller (Kodla Çizim) ---
+        const colors = ["#FF5252", "#FF4081", "#7C4DFF", "#536DFE", "#40C4FF", "#18FFFF"]; // Kırmızı, Pembe, Mor, Mavi, Turkuaz, Cyan
+        function drawCandy(ctx, colorIndex, x, y) {
+            ctx.fillStyle = colors[colorIndex]; ctx.shadowBlur = 5; ctx.shadowColor = colors[colorIndex];
+            switch (colorIndex) {
+                case 0: ctx.fillRect(x + 15, y + 15, 40, 40); break; // Kare
+                case 1: ctx.beginPath(); ctx.arc(x + 35, y + 35, 20, 0, Math.PI * 2); ctx.fill(); break; // Daire
+                case 2: ctx.beginPath(); ctx.moveTo(x+35, y+15); ctx.lineTo(x+55, y+55); ctx.lineTo(x+15, y+55); ctx.closePath(); ctx.fill(); break; // Üçgen
+                case 3: ctx.fillRect(x + 10, y + 25, 50, 20); break; // Yatay Çubuk
+                case 4: ctx.beginPath(); ctx.arc(x + 35, y + 35, 18, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); break; // Halka
+                case 5: ctx.fillRect(x + 25, y + 10, 20, 50); break; // Dikey Çubuk
+            } ctx.shadowBlur = 0;
+        }
+
+        function createGrid() { for (let r = 0; r < gridSize; r++) { grid[r] = []; for (let c = 0; c < gridSize; c++) grid[r][c] = Math.floor(Math.random() * colors.length); } checkAndFixMatches(); }
+        function drawGrid() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let r = 0; r < gridSize; r++) for (let c = 0; c < gridSize; c++) if (grid[r][c] !== null) drawCandy(ctx, grid[r][c], c * cellSize, r * cellSize); }
+        function checkAndFixMatches() { while(true){ let m=checkMatches(); if(m.length>0){ score+=m.length*10; m.forEach(id=>grid[Math.floor(id/gridSize)][id%gridSize]=Math.floor(Math.random()*colors.length)); }else break; } score=0; }
+        function checkMatches() { let m=[]; for(let r=0; r<gridSize; r++) for(let c=0; c<gridSize-2; c++) if(grid[r][c]===grid[r][c+1]&&grid[r][c]===grid[r][c+2]) m.push(r*gridSize+c, r*gridSize+c+1, r*gridSize+c+2); for(let c=0; c<gridSize; c++) for(let r=0; r<gridSize-2; r++) if(grid[r][c]===grid[r+1][c]&&grid[r][c]===grid[r+2][c]) m.push(r*gridSize+c, (r+1)*gridSize+c, (r+2)*gridSize+c); return [...new Set(m)]; }
+        function dropCandies() { for(let c=0; c<gridSize; c++){ let k=gridSize-1; for(let r=gridSize-1; r>=0; r--) if(grid[r][c]!==null){ grid[k][c]=grid[r][c]; k--; } for(let r=k; r>=0; r--) grid[r][c]=null; } for(let c=0; c<gridSize; c++) for(let r=0; r<gridSize; r++) if(grid[r][c]===null) grid[r][c]=Math.floor(Math.random()*colors.length); }
+        
+        async function solveMatches() { let m; while((m=checkMatches()).length>0){ score+=m.length*10; document.getElementById("score").innerText=score; m.forEach(id=>grid[Math.floor(id/gridSize)][id%gridSize]=null); drawGrid(); await new Promise(r=>setTimeout(r, 200)); dropCandies(); drawGrid(); await new Promise(r=>setTimeout(r, 200)); } movesActive=true; }
+        
+        canvas.addEventListener("mousedown", async e => { if(!movesActive) return; const c=Math.floor((e.clientX-canvas.getBoundingClientRect().left)/cellSize); const r=Math.floor((e.clientY-canvas.getBoundingClientRect().top)/cellSize); if(!firstClick) firstClick={r,c}; else{ if(Math.abs(firstClick.r-r)+Math.abs(firstClick.c-c)===1){ movesActive=false; [grid[r][c],grid[firstClick.r][firstClick.c]]=[grid[firstClick.r][firstClick.c],grid[r][c]]; drawGrid(); if(checkMatches().length===0){ [grid[r][c],grid[firstClick.r][firstClick.c]]=[grid[firstClick.r][firstClick.c],grid[r][c]]; drawGrid(); movesActive=true; }else await solveMatches(); } firstClick=null; } });
+        
+        createGrid(); drawGrid();
+    </script>
+</body>
+</html>
