@@ -5,52 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sanu Game Company</title>
     <style>
-        /* Genel Ayarlar ve Renkler */
         :root {
-            --bg-color: #0f0f13;
             --text-color: #e0e0e0;
-            --accent-color: #4CAF50; /* Pharmos/Sanos temasına uygun şifa yeşili */
-            --candy-accent: #FF4081; /* Candy Match temasına uygun pembe */
-            --card-bg: #1c1c24;
+            --accent-color: #4CAF50;
+            --candy-accent: #FF4081;
+            --card-bg: rgba(28, 28, 36, 0.8); /* Arka plan görünsün diye hafif şeffaf */
         }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; text-align: center; color: var(--text-color); overflow-x: hidden; }
         
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; text-align: center; }
+        /* CANLI ARKA PLAN CANVAS'I */
+        #universeCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; }
 
-        /* Navigasyon (Menü) */
-        nav { background-color: rgba(15, 15, 19, 0.9); padding: 15px; position: fixed; width: 100%; top: 0; z-index: 1000; }
-        nav a { color: var(--text-color); text-decoration: none; margin: 0 15px; font-weight: bold; transition: color 0.3s; }
+        nav { background-color: rgba(15, 15, 19, 0.9); padding: 15px; position: fixed; width: 100%; top: 0; z-index: 1000; display: flex; justify-content: center; flex-wrap: wrap; }
+        nav a { color: var(--text-color); text-decoration: none; margin: 5px 15px; font-weight: bold; transition: color 0.3s; }
         nav a:hover { color: var(--accent-color); }
 
-        /* Ana Giriş (Hero Section) */
         header { padding: 120px 20px 50px; }
-        .logo-container { margin: 0 auto 20px; width: 150px; height: 150px; background: url('snake.png') center/cover; border-radius: 50%; box-shadow: 0 0 20px var(--accent-color); }
-        h1 { margin-bottom: 5px; letter-spacing: 2px; }
-        .subtitle { color: #888; font-style: italic; }
+        .logo-container { margin: 0 auto 20px; width: 120px; height: 120px; background: url('snake.png') center/cover; border-radius: 50%; box-shadow: 0 0 20px var(--accent-color); }
+        h1 { margin-bottom: 5px; letter-spacing: 2px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+        .subtitle { color: #ccc; font-style: italic; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
 
-        /* Oyunlar Bölümü */
-        section { padding: 60px 20px; }
-        .games-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 30px; }
-        
-        /* Linklerin alt çizgisini kaldırmak ve rengi korumak için */
+        section { padding: 40px 20px; }
+        .games-grid { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 30px; max-width: 1200px; margin-left: auto; margin-right: auto; }
         .game-link { text-decoration: none; color: inherit; display: block; }
-
-        .game-card { background-color: var(--card-bg); padding: 20px; border-radius: 15px; width: 200px; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; }
-        .game-card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3); }
+        .game-card { background-color: var(--card-bg); padding: 20px; border-radius: 15px; width: 220px; backdrop-filter: blur(5px); transition: transform 0.3s, box-shadow 0.3s; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        .game-card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(76, 175, 80, 0.5); }
+        .candy-card:hover { box-shadow: 0 10px 20px rgba(255, 64, 129, 0.5); }
+        .candy-card h3 { color: var(--candy-accent); }
         .game-icon { width: 100px; height: 100px; margin: 0 auto 15px; background-color: #333; border-radius: 20px; }
         .game-card h3 { margin: 0; color: var(--accent-color); }
 
-        /* Candy Match 3 için özel hover efekti */
-        .candy-card:hover { box-shadow: 0 10px 20px rgba(255, 64, 129, 0.3); }
-        .candy-card h3 { color: var(--candy-accent); }
+        .info-box { background-color: var(--card-bg); max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 15px; text-align: left; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); }
+        .info-box p { margin: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        footer { background-color: rgba(8, 8, 10, 0.9); padding: 20px; margin-top: 40px; }
 
-        /* Hakkımızda ve İletişim */
-        .info-box { background-color: var(--card-bg); max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 15px; text-align: left; }
-        .info-box p { margin: 10px 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        
-        footer { background-color: #08080a; padding: 20px; margin-top: 40px; }
+        @media (max-width: 768px) { .game-card { width: 100%; max-width: 300px; } }
     </style>
 </head>
 <body>
+
+    <canvas id="universeCanvas"></canvas>
 
     <nav>
         <a href="#home">Ana Sayfa</a>
@@ -68,47 +62,21 @@
     <section id="games">
         <h2>Oyunlarımız</h2>
         <div class="games-grid">
-            
             <a href="https://phobia-official.netlify.app" target="_blank" class="game-link">
-                <div class="game-card">
-                    <div class="game-icon" style="background: url('phobia.jpeg') center/cover;"></div>
-                    <h3>Phobia</h3>
-                    <p>Korkularınla yüzleş.</p>
-                </div>
+                <div class="game-card"><div class="game-icon" style="background: url('phobia.jpeg') center/cover;"></div><h3>Phobia</h3><p>Korkularınla yüzleş.</p></div>
             </a>
-
             <a href="https://pharmos-official-tr.web.app/" target="_blank" class="game-link">
-                <div class="game-card">
-                    <div class="game-icon" style="background: url('pharmos.png') center/cover;"></div>
-                    <h3>Pharmos</h3>
-                    <p>Yeni bir macera.</p>
-                </div>
+                <div class="game-card"><div class="game-icon" style="background: url('pharmos.png') center/cover;"></div><h3>Pharmos</h3><p>Yeni bir macera.</p></div>
             </a>
-
             <a href="https://gezegen-merge.netlify.app" target="_blank" class="game-link">
-                <div class="game-card">
-                    <div class="game-icon" style="background: url('merge.png') center/cover;"></div>
-                    <h3>Gezegen Mergesi</h3>
-                    <p>Evreni birleştir!</p>
-                </div>
+                <div class="game-card"><div class="game-icon" style="background: url('merge.png') center/cover;"></div><h3>Gezegen Mergesi</h3><p>Evreni birleştir!</p></div>
             </a>
-
             <a href="cosmic.html" class="game-link">
-                <div class="game-card">
-                    <div class="game-icon" style="background: url('cosmic.png') center/cover;"></div>
-                    <h3>Cosmic Run</h3>
-                    <p>Kozmik yolda yüksek skor yap!</p>
-                </div>
+                <div class="game-card"><div class="game-icon" style="background: url('cosmic.png') center/cover;"></div><h3>Cosmic Run</h3><p>Kozmik yolda yüksek skor yap!</p></div>
             </a>
-
             <a href="candy.html" class="game-link">
-                <div class="game-card candy-card">
-                    <div class="game-icon" style="background: url('candy.png') center/cover;"></div>
-                    <h3>Candy Match 3</h3>
-                    <p>Şekerleri eşleştir, puanı kap!</p>
-                </div>
+                <div class="game-card candy-card"><div class="game-icon" style="background: url('candy.png') center/cover;"></div><h3>Candy Match 3</h3><p>Şekerleri eşleştir, puanı kap!</p></div>
             </a>
-
         </div>
     </section>
 
@@ -129,10 +97,90 @@
             <h3 style="color: var(--accent-color);">sanugaemcompany@gmail.com</h3>
         </div>
     </section>
+    <footer><p>&copy; 2026 Sanu Game Company. Tüm hakları saklıdır.</p></footer>
 
-    <footer>
-        <p>&copy; 2026 Sanu Game Company. Tüm hakları saklıdır.</p>
-    </footer>
+    <script>
+        const canvas = document.getElementById('universeCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
 
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+        // Zamanı ve Renkleri Belirle
+        const hour = new Date().getHours();
+        let skyColor1, skyColor2, celestialBody;
+        
+        if (hour >= 6 && hour < 10) { skyColor1 = "#FF7E5F"; skyColor2 = "#FEB47B"; celestialBody = "sun_dawn"; } // Sabah
+        else if (hour >= 10 && hour < 17) { skyColor1 = "#4CA1AF"; skyColor2 = "#C4E0E5"; celestialBody = "sun_day"; } // Öğle
+        else if (hour >= 17 && hour < 20) { skyColor1 = "#2c3e50"; skyColor2 = "#fd746c"; celestialBody = "sun_dusk"; } // Akşamüstü
+        else { skyColor1 = "#0f2027"; skyColor2 = "#203a43"; celestialBody = "moon"; } // Gece
+
+        // Objeler
+        const stars = []; const meteors = []; const shootingStars = [];
+        const isNight = (hour >= 18 || hour < 6);
+        
+        // Yıldızları oluştur (Sadece gece ve akşam görünür)
+        if (isNight) {
+            for(let i=0; i<150; i++) stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2+1, a: Math.random() });
+        }
+
+        function drawPixelRect(x, y, w, h, color) { ctx.fillStyle = color; ctx.fillRect(Math.floor(x), Math.floor(y), w, h); }
+
+        function drawCelestial() {
+            const cx = canvas.width - 150; const cy = 100;
+            if (celestialBody.includes("sun")) {
+                const color = celestialBody === "sun_day" ? "#FFD700" : "#FF4500";
+                // Piksel Güneş Çizimi (Yuvarlağımsı kareler)
+                drawPixelRect(cx-30, cy-40, 60, 80, color); drawPixelRect(cx-40, cy-30, 80, 60, color);
+                drawPixelRect(cx-20, cy-50, 40, 100, color); drawPixelRect(cx-50, cy-20, 100, 40, color);
+            } else {
+                // Piksel Yarım Ay
+                drawPixelRect(cx-20, cy-40, 40, 80, "#DDDDDD"); drawPixelRect(cx-30, cy-30, 60, 60, "#DDDDDD");
+                drawPixelRect(cx-10, cy-30, 40, 60, skyColor1); // İçini oyarak ay şekli ver
+            }
+        }
+
+        function animate() {
+            // Arka plan gradyanı
+            let grd = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            grd.addColorStop(0, skyColor1); grd.addColorStop(1, skyColor2);
+            ctx.fillStyle = grd; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawCelestial();
+
+            // Yıldızlar
+            stars.forEach(star => {
+                star.a += 0.05;
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(Math.sin(star.a))})`;
+                drawPixelRect(star.x, star.y, star.s, star.s, ctx.fillStyle);
+            });
+
+            // Kayan Yıldızlar (Uzaktaki, ısısız, hızlı beyaz çizgiler)
+            if (Math.random() < 0.03) shootingStars.push({ x: Math.random()*canvas.width, y: 0, l: Math.random()*50+20, sx: -10, sy: 10 });
+            shootingStars.forEach((ss, i) => {
+                ctx.fillStyle = "rgba(255,255,255,0.8)";
+                ctx.beginPath(); ctx.moveTo(ss.x, ss.y); ctx.lineTo(ss.x - ss.l, ss.y + ss.l); ctx.lineWidth = 2; ctx.strokeStyle = "white"; ctx.stroke();
+                ss.x += ss.sx; ss.y += ss.sy;
+                if(ss.y > canvas.height || ss.x < 0) shootingStars.splice(i, 1);
+            });
+
+            // Göktaşları (Isınan, arkasında alev bırakan pikseller)
+            if (Math.random() < 0.01) meteors.push({ x: Math.random()*canvas.width, y: -50, sx: -3, sy: 5, size: Math.random()*4+4 });
+            meteors.forEach((m, i) => {
+                // Isı/Alev efekti (Kuyruk)
+                drawPixelRect(m.x+10, m.y-15, m.size, m.size, "rgba(255, 69, 0, 0.4)");
+                drawPixelRect(m.x+5, m.y-10, m.size, m.size, "rgba(255, 140, 0, 0.6)");
+                drawPixelRect(m.x+2, m.y-5, m.size, m.size, "rgba(255, 215, 0, 0.8)");
+                // Ana gövde
+                drawPixelRect(m.x, m.y, m.size, m.size, "#8B4513");
+                
+                m.x += m.sx; m.y += m.sy;
+                if(m.y > canvas.height) meteors.splice(i, 1);
+            });
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
 </body>
 </html>
