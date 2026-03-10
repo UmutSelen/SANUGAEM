@@ -3,107 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cosmic Run - Canlı Atmosfer Sürümü</title>
+    <title>Cosmic Run - Sanu Game Engine</title>
     <style>
         /* ==========================================
-           1. MOBİL UYUMLU CSS
+           1. MOBİL UYUMLU CSS TASARIMI
            ========================================== */
         body { 
-            margin: 0; 
-            padding: 0; 
-            overflow: hidden; 
-            background-color: #05050a; 
-            color: white; 
-            font-family: 'Segoe UI', sans-serif; 
-            touch-action: none;
+            margin: 0; padding: 0; overflow: hidden; 
+            background-color: #05050a; color: white; 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            touch-action: none; user-select: none;
         }
         
         #gameArea { 
-            position: relative; 
-            width: 100vw; 
-            height: 100vh; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
+            position: relative; width: 100vw; height: 100vh; 
+            display: flex; align-items: center; justify-content: center; 
         }
         
         canvas { 
-            background: #090a0f; 
-            border: 3px solid #4CAF50; 
-            border-radius: 15px; 
-            max-width: 95vw; 
-            max-height: 80vh; 
-            box-shadow: 0 0 20px rgba(76, 175, 80, 0.2);
+            background: #000; 
+            border: 4px solid #4CAF50; border-radius: 20px; 
+            max-width: 95vw; max-height: 80vh; 
+            box-shadow: 0 0 40px rgba(76, 175, 80, 0.3);
         }
         
-        /* MOBİL UI */
+        /* MOBİL ARAYÜZ (UI) */
         .top-ui { 
-            position: absolute; 
-            top: 15px; 
-            left: 10px; 
-            right: 10px; 
-            display: flex; 
-            justify-content: space-between; 
-            z-index: 10; 
-            pointer-events: none; 
+            position: absolute; top: 20px; left: 15px; right: 15px; 
+            display: flex; justify-content: space-between; 
+            z-index: 10; pointer-events: none; 
         }
         
         .score-board { 
-            font-size: 18px; 
-            font-weight: bold; 
-            pointer-events: auto; 
-            background: rgba(0,0,0,0.6); 
-            padding: 8px 12px; 
-            border-radius: 12px; 
-            border: 2px solid #4CAF50;
-            display: flex;
-            flex-direction: column;
+            font-size: 20px; font-weight: 900; pointer-events: auto; 
+            background: rgba(0,0,0,0.5); padding: 10px 18px; 
+            border-radius: 15px; border: 2px solid #4CAF50;
+            display: flex; flex-direction: column; backdrop-filter: blur(5px);
         }
 
-        .powerup-text { font-size: 12px; font-weight: bold; display: none; }
+        .powerup-label { font-size: 12px; font-weight: bold; margin-top: 4px; display: none; }
         
-        .controls { display: flex; gap: 10px; pointer-events: auto; }
+        .controls { display: flex; gap: 12px; pointer-events: auto; }
         
         .icon-btn { 
-            background: rgba(0,0,0,0.6); 
-            border: 2px solid #4CAF50; 
-            color: #4CAF50; 
-            width: 45px; 
-            height: 45px; 
-            border-radius: 10px; 
-            font-size: 20px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            text-decoration: none;
+            background: rgba(0,0,0,0.5); border: 2px solid #4CAF50; 
+            color: #4CAF50; width: 50px; height: 50px; border-radius: 12px; 
+            font-size: 24px; display: flex; align-items: center; justify-content: center;
+            text-decoration: none; transition: 0.2s;
         }
+        .icon-btn:active { transform: scale(0.9); }
 
-        /* MODALLAR */
-        #helpModal, #gameOverScreen { 
-            display: none; 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            background: rgba(10, 15, 20, 0.95); 
-            border: 4px solid #4CAF50; 
-            padding: 20px; 
-            border-radius: 20px; 
-            z-index: 100; 
-            width: 300px; 
-            text-align: center;
+        /* OYUN SONU VE BİLGİ MODALLARI */
+        #gameOverScreen { 
+            display: none; position: absolute; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); background: rgba(10, 15, 20, 0.98); 
+            border: 4px solid #FF5722; padding: 35px; border-radius: 30px; 
+            z-index: 100; width: 300px; text-align: center;
+            box-shadow: 0 0 60px rgba(255, 87, 34, 0.5);
         }
         
-        button.action-btn { 
-            background: #4CAF50; 
-            color: white; 
-            border: none; 
-            padding: 12px 20px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            border-radius: 10px; 
-            width: 100%;
-            margin-top: 15px;
+        .action-btn { 
+            background: #4CAF50; color: white; border: none; 
+            padding: 15px 25px; font-size: 18px; font-weight: bold; 
+            border-radius: 15px; width: 100%; margin-top: 20px;
         }
     </style>
 </head>
@@ -111,206 +73,240 @@
     <div id="gameArea">
         <div class="top-ui">
             <div class="score-board">
-                <span>Skor: <span id="score">0</span></span>
-                <span id="textTriple" class="powerup-text" style="color:#00E5FF">🚀 3X ZIPLA!</span>
-                <span id="textShield" class="powerup-text" style="color:#00E676">🛡️ KALKAN!</span>
+                <span id="scoreDisplay">0</span>
+                <span id="tripleJumpText" class="powerup-label" style="color:#00E5FF">🚀 TRIPLE JUMP</span>
+                <span id="shieldText" class="powerup-label" style="color:#00E676">🛡️ SHIELD ACTIVE</span>
             </div>
             <div class="controls">
                 <a href="index.html" class="icon-btn">🏠</a>
                 <button class="icon-btn" onclick="toggleVibration()">📳</button>
-                <button class="icon-btn" onclick="toggleHelp()">?</button>
             </div>
         </div>
         
         <canvas id="gameCanvas" width="800" height="400"></canvas>
         
-        <div id="helpModal">
-            <h2 style="color: #4CAF50;">NASIL OYNANIR?</h2>
-            <p>Zıplamak için ekrana dokun.</p>
-            <p>Gündüzleri kuşlara, geceleri meteorlara dikkat et!</p>
-            <button class="action-btn" onclick="toggleHelp()">BAŞLA</button>
-        </div>
-        
         <div id="gameOverScreen">
-            <h2 style="color: #FF5722;">OYUN BİTTİ!</h2>
-            <p>Skorun: <strong id="finalScore">0</strong></p>
-            <button class="action-btn" onclick="resetGame()">Yeniden Dene</button>
+            <h2 style="color: #FF5722; margin-top: 0;">PARÇALANDIN!</h2>
+            <p style="font-size: 20px;">Skor: <strong id="finalScore">0</strong></p>
+            <button class="action-btn" onclick="resetGame()">TEKRAR KOŞ</button>
         </div>
     </div>
 
     <script>
+        /* ==========================================
+           2. JAVASCRIPT MOTORU - COSMIC FLUID
+           ========================================== */
         const canvas = document.getElementById("gameCanvas"); 
         const ctx = canvas.getContext("2d");
         
-        function resizeCanvas() { 
+        function resize() { 
             const aspect = 800 / 400; 
             if(window.innerWidth / window.innerHeight < aspect) { 
                 canvas.style.width = window.innerWidth * 0.95 + "px"; 
                 canvas.style.height = (window.innerWidth * 0.95 / aspect) + "px"; 
             } else { 
-                canvas.style.height = window.innerHeight * 0.7 + "px"; 
-                canvas.style.width = (window.innerHeight * 0.7 * aspect) + "px"; 
+                canvas.style.height = window.innerHeight * 0.75 + "px"; 
+                canvas.style.width = (window.innerHeight * 0.75 * aspect) + "px"; 
             } 
         }
-        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        window.addEventListener('resize', resize); resize();
 
-        // --- ZAMAN SİSTEMİ ---
+        // --- CANLI ZAMAN SİSTEMİ ---
         const hour = new Date().getHours();
-        const isDay = hour >= 6 && hour < 18; // 06:00 - 18:00 arası gündüz
+        const isDayTime = hour >= 6 && hour < 18; // Sabah 6 - Akşam 6 arası gündüz
 
-        let frames = 0, score = 0, gameActive = true, baseGameSpeed = 5; 
-        let timers = { tripleJump: 0 }, hasShield = false, isVibrationEnabled = true;
+        let frames = 0, score = 0, gameActive = true, gameSpeed = 5; 
+        let timers = { triple: 0 }, hasShield = false, isVib = true;
+        let particles = [];
 
-        function pRect(x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(Math.floor(x), Math.floor(y), w, h); }
-
-        // --- ATMOSFERİK OBJELER (Bulutlar, Yıldızlar, Kuşlar) ---
-        const bgElements = [];
-        for(let i=0; i<15; i++) {
-            bgElements.push({
-                x: Math.random()*800, 
-                y: Math.random()*(isDay ? 150 : 300), 
-                s: Math.random()*2+2, 
-                speed: Math.random()*0.5+0.1
+        // --- ATMOSFERİK PARÇACIKLAR (Bulutlar veya Yıldızlar) ---
+        const bgAssets = [];
+        for(let i=0; i<20; i++) {
+            bgAssets.push({
+                x: Math.random() * 800, 
+                y: Math.random() * (isDayTime ? 150 : 350), 
+                size: Math.random() * 2 + 1, 
+                speed: Math.random() * 0.5 + 0.1
             });
         }
 
-        function drawBackground() {
-            // Gökyüzü rengi
-            ctx.fillStyle = isDay ? "#4facfe" : "#090a0f";
-            ctx.fillRect(0,0,800,400);
+        function drawWorld() {
+            // Dinamik Gökyüzü
+            let skyGrd = ctx.createLinearGradient(0, 0, 0, 400);
+            if(isDayTime) {
+                skyGrd.addColorStop(0, "#4facfe"); skyGrd.addColorStop(1, "#00f2fe");
+            } else {
+                skyGrd.addColorStop(0, "#050508"); skyGrd.addColorStop(1, "#151525");
+            }
+            ctx.fillStyle = skyGrd; ctx.fillRect(0, 0, 800, 400);
 
-            bgElements.forEach(el => {
-                if(isDay) {
-                    // Bulut çizimi
-                    pRect(el.x, el.y, 40, 15, "rgba(255,255,255,0.7)");
-                    pRect(el.x+10, el.y-10, 20, 10, "rgba(255,255,255,0.7)");
+            // Arka Plan Objeleri
+            bgAssets.forEach(asset => {
+                ctx.fillStyle = "white";
+                if(isDayTime) {
+                    // Bulut Çizimi
+                    ctx.globalAlpha = 0.4;
+                    ctx.beginPath();
+                    ctx.arc(asset.x, asset.y, 20, 0, Math.PI*2);
+                    ctx.arc(asset.x+15, asset.y-10, 15, 0, Math.PI*2);
+                    ctx.arc(asset.x+30, asset.y, 18, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
                 } else {
-                    // Yıldız çizimi
-                    pRect(el.x, el.y, el.s, el.s, "white");
+                    // Yıldız Çizimi
+                    ctx.fillRect(asset.x, asset.y, asset.size, asset.size);
                 }
-                el.x -= el.speed;
-                if(el.x < -50) el.x = 850;
+                asset.x -= asset.speed;
+                if(asset.x < -60) asset.x = 860;
             });
         }
 
-        // --- OYUNCU ---
+        // --- OYUNCU (DEVE KUŞU) ---
         const player = {
-            x: 80, y: 300, w: 35, h: 45, dy: 0, gravity: 0.6, jumpPower: -10, grounded: false, jumpCount: 0,
+            x: 100, y: 315, w: 40, h: 45, dy: 0, gravity: 0.6, jumpPower: -11, grounded: false, jumpCount: 0,
             draw: function() {
-                let px = this.x; let py = this.y;
+                ctx.save();
                 if(hasShield) {
-                    ctx.strokeStyle = "#00E676"; ctx.lineWidth = 2;
-                    ctx.strokeRect(px-5, py-5, this.w+10, this.h+10);
+                    ctx.shadowBlur = 15; ctx.shadowColor = "#00E676";
+                    ctx.strokeStyle = "#00E676"; ctx.lineWidth = 3;
+                    ctx.strokeRect(this.x-5, this.y-5, this.w+10, this.h+10);
                 }
-                // Basit Piksel Deve Kuşu
-                pRect(px+10, py, 15, 30, "#E0E0E0"); // Boyun
-                pRect(px, py+20, 25, 20, "#4CAF50"); // Gövde
-                pRect(px+5, py+38, 4, 8, "#FF9800"); // Ayak 1
-                pRect(px+15, py+38, 4, 8, "#FF9800"); // Ayak 2
+                // Piksel Deve Kuşu (Eksiksiz Detay)
+                ctx.fillStyle = "#E0E0E0"; ctx.fillRect(this.x+15, this.y, 10, 25); // Boyun
+                ctx.fillStyle = "#4CAF50"; ctx.fillRect(this.x, this.y+20, 35, 18); // Gövde
+                ctx.fillStyle = "black"; ctx.fillRect(this.x+22, this.y+5, 4, 4); // Göz
+                ctx.fillStyle = "#FF9800"; ctx.fillRect(this.x+25, this.y+8, 8, 4); // Gaga
+                // Bacaklar
+                let legMove = Math.sin(frames * 0.2) * 5;
+                ctx.fillStyle = "#FF9800";
+                if(this.grounded) {
+                    ctx.fillRect(this.x+8, this.y+38, 4, 7+legMove);
+                    ctx.fillRect(this.x+22, this.y+38, 4, 7-legMove);
+                } else {
+                    ctx.fillRect(this.x+8, this.y+38, 4, 10);
+                    ctx.fillRect(this.x+22, this.y+38, 4, 10);
+                }
+                ctx.restore();
             },
             update: function() {
                 this.dy += this.gravity; this.y += this.dy;
-                if(this.y + this.h >= 360) { this.y = 360 - this.h; this.dy = 0; this.grounded = true; this.jumpCount = 0; }
-                else { this.grounded = false; }
+                if(this.y + this.h >= 360) {
+                    this.y = 360 - this.h; this.dy = 0; this.grounded = true; this.jumpCount = 0;
+                } else { this.grounded = false; }
             },
             jump: function() {
-                let limit = timers.tripleJump > 0 ? 3 : 2;
-                if(this.grounded || this.jumpCount < limit) { this.dy = this.jumpPower; this.jumpCount++; this.grounded = false; }
+                let limit = timers.triple > 0 ? 3 : 2;
+                if(this.grounded || this.jumpCount < limit) {
+                    this.dy = this.jumpPower; this.jumpCount++; this.grounded = false;
+                    triggerVibration(30);
+                }
             }
         };
 
-        // --- ENGELLER (Gece Meteor / Gündüz Kuş) ---
+        // --- ENGELLER (Meteor vs Kuş) ---
         const obstacles = [];
-        function handleObstacles() {
-            if(frames % 100 === 0) {
-                let type = Math.random() > 0.7 ? 'air' : 'ground';
-                let obs = { x: 850, y: type === 'air' ? 220 : 320, w: 30, h: 40, type: type };
-                
-                // Gündüz havadan kuş, gece havadan meteor gelir
-                if(type === 'air' && !isDay) { // Gece Meteoru (Çapraz düşer)
-                    obs.y = -50; obs.speedX = 6; obs.speedY = 4; obs.isMeteor = true;
+        function spawnObstacle() {
+            let type = Math.random() > 0.7 ? 'air' : 'ground';
+            let obs = { x: 850, y: type === 'air' ? 200 : 320, w: 35, h: 40, type: type, color: "#B71C1C" };
+            
+            if(type === 'air') {
+                if(!isDayTime) { // Gece: Meteor
+                    obs.y = -50; obs.isMeteor = true; 
+                    obs.speedX = 7; obs.speedY = 5;
+                } else { // Gündüz: Kuş
+                    obs.color = "#FFF"; obs.isBird = true;
                 }
-                obstacles.push(obs);
             }
+            obstacles.push(obs);
+        }
+
+        function handleObstacles() {
+            if(frames % 90 === 0) spawnObstacle();
 
             for(let i=obstacles.length-1; i>=0; i--) {
                 let o = obstacles[i];
                 if(o.isMeteor) {
                     o.x -= o.speedX; o.y += o.speedY;
-                    pRect(o.x, o.y, 20, 20, "#FF5252"); // Kırmızı Meteor
+                    ctx.fillStyle = "#FF5252"; ctx.fillRect(o.x, o.y, 25, 25);
+                    // Ateş kuyruğu
+                    ctx.fillStyle = "#FF9800"; ctx.fillRect(o.x+15, o.y-10, 10, 10);
                 } else {
-                    o.x -= baseGameSpeed;
-                    if(o.type === 'air') {
-                        // Kuş veya Uçan Engel
-                        pRect(o.x, o.y, 30, 20, isDay ? "#FFF" : "#9C27B0");
-                        if(isDay) pRect(o.x-5, o.y+5, 10, 5, "#FF9800"); // Kanat
+                    o.x -= gameSpeed;
+                    ctx.fillStyle = o.color;
+                    if(o.isBird) {
+                        ctx.fillRect(o.x, o.y, 30, 20); // Kuş gövdesi
+                        let wing = Math.sin(frames * 0.3) * 10;
+                        ctx.fillRect(o.x+10, o.y-5+wing, 10, 5); // Kanat
                     } else {
-                        pRect(o.x, o.y, o.w, o.h, "#B71C1C"); // Yer engeli
+                        ctx.fillRect(o.x, o.y, o.w, o.h); // Yer engeli
                     }
                 }
 
-                // Çarpışma
+                // Çarpışma Testi
                 if(player.x < o.x + o.w && player.x + player.w > o.x && player.y < o.y + o.h && player.y + player.h > o.y) {
                     if(hasShield) {
-                        hasShield = false; document.getElementById("textShield").style.display="none"; obstacles.splice(i,1);
-                    } else { gameActive = false; showGameOver(); }
+                        hasShield = false; document.getElementById("shieldText").style.display="none";
+                        obstacles.splice(i, 1); triggerVibration(100);
+                    } else {
+                        die();
+                    }
                 }
                 if(o.x < -100 || o.y > 450) obstacles.splice(i, 1);
             }
         }
 
-        // --- ANA DÖNGÜ ---
+        // --- OYUN AKIŞI ---
         function mainLoop() {
             if(!gameActive) return;
-            drawBackground();
-            pRect(0, 360, 800, 40, "#1c2833"); // Zemin
+            ctx.clearRect(0,0,800,400);
+            drawWorld();
             
+            // Zemin
+            ctx.fillStyle = "#1c2833"; ctx.fillRect(0, 360, 800, 40);
+            ctx.fillStyle = "#4CAF50"; ctx.fillRect(0, 360, 800, 4);
+
             player.update();
             player.draw();
             handleObstacles();
 
-            if(frames % 300 === 0) {
-                // Rastgele Güçlendirme
-                if(Math.random() > 0.5) { hasShield = true; document.getElementById("textShield").style.display="block"; }
-                else { timers.tripleJump = 300; document.getElementById("textTriple").style.display="block"; }
+            // Güçlendirme Sistemi
+            if(frames % 400 === 0) {
+                if(Math.random() > 0.5) { hasShield = true; document.getElementById("shieldText").style.display="block"; }
+                else { timers.triple = 300; document.getElementById("tripleJumpText").style.display="block"; }
             }
-
-            if(timers.tripleJump > 0) timers.tripleJump--;
-            else document.getElementById("textTriple").style.display="none";
+            if(timers.triple > 0) timers.triple--; else document.getElementById("tripleJumpText").style.display="none";
 
             frames++; score++;
-            document.getElementById("score").innerText = Math.floor(score/10);
+            document.getElementById("scoreDisplay").innerText = Math.floor(score/10);
+            if(score % 1000 === 0) gameSpeed += 0.5;
+
             requestAnimationFrame(mainLoop);
         }
 
-        // --- KONTROLLER ---
-        window.addEventListener("pointerdown", (e) => {
-            if(e.target.tagName === "BUTTON" || e.target.tagName === "A") return;
-            if(gameActive) player.jump();
-        });
-
-        function showGameOver() {
+        function die() {
+            gameActive = false;
             document.getElementById("gameOverScreen").style.display = "block";
             document.getElementById("finalScore").innerText = Math.floor(score/10);
-            if (isVibrationEnabled && navigator.vibrate) navigator.vibrate(200);
+            triggerVibration(300);
         }
 
         function resetGame() {
             obstacles.length = 0; score = 0; frames = 0; gameActive = true;
-            timers.tripleJump = 0; hasShield = false;
-            player.y = 300; player.dy = 0;
+            timers.triple = 0; hasShield = false; gameSpeed = 5;
+            player.y = 315; player.dy = 0;
             document.getElementById("gameOverScreen").style.display = "none";
             requestAnimationFrame(mainLoop);
         }
 
-        function toggleHelp() {
-            const m = document.getElementById("helpModal");
-            m.style.display = (m.style.display === "block" ? "none" : "block");
-        }
+        function toggleVibration() { isVib = !isVib; triggerVibration(60); }
+        function triggerVibration(ms) { if(isVib && navigator.vibrate) navigator.vibrate(ms); }
 
-        function toggleVibration() { isVibrationEnabled = !isVibrationEnabled; if(isVibrationEnabled && navigator.vibrate) navigator.vibrate(50); }
+        window.addEventListener("pointerdown", (e) => {
+            if(e.target.tagName === "BUTTON" || e.target.tagName === "A") return;
+            if(gameActive) player.jump(); else if(document.getElementById("gameOverScreen").style.display === "block") resetGame();
+        });
 
-        requestAnimationFrame(mainLoop);
+        init();
     </script>
 </body>
 </html>
