@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sanu Candy - Mobil Özel Sürüm</title>
+    <title>Sanu Candy - The Ultimate Engine</title>
     <style>
-        /* ==========================================================================
-           1. MOBİL ÖNCELİKLİ CSS TASARIMI
-           ========================================================================== */
-        
+        /* ==========================================
+           1. CSS TASARIM VE GÖRSEL MİMARİ
+           ========================================== */
         body { 
             margin: 0; 
             padding: 0; 
@@ -25,7 +24,6 @@
             height: 100vh;
         }
 
-        /* Arka Plan */
         #universeCanvas { 
             position: fixed; 
             top: 0; 
@@ -35,7 +33,6 @@
             z-index: -1; 
         }
 
-        /* Oyun Alanı - Mobilde tam ekran uyumu */
         #gameArea { 
             position: relative; 
             width: 100%; 
@@ -46,29 +43,28 @@
             justify-content: center; 
         }
 
-        /* Kanvas - Performans için shadow azaltıldı, blur optimize edildi */
         #gameCanvas { 
-            background: rgba(10, 10, 25, 0.8); 
-            box-shadow: 0 0 30px rgba(255, 64, 129, 0.3); 
-            border: 4px solid #FF4081; 
-            border-radius: 20px; 
+            background: rgba(10, 10, 25, 0.85); 
+            box-shadow: 0 0 50px rgba(255, 64, 129, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.05); 
+            border: 5px solid #FF4081; 
+            border-radius: 30px; 
             max-width: 95vw; 
-            max-height: 70vh; /* Skor ve butonlar için yer kalsın */
+            max-height: 75vh; 
             cursor: pointer; 
+            backdrop-filter: blur(15px);
             touch-action: none; 
         }
 
-        /* ==========================================================================
-           2. MOBİL UI - PARMAK ÖLÇEKLİ BUTONLAR
-           ========================================================================== */
-        
+        /* ==========================================
+           2. MOBİL UYUMLU UI (SKOR & KONTROL)
+           ========================================== */
         .top-ui { 
             position: absolute; 
-            top: 20px; 
+            top: 25px; 
             width: 90%;
             display: flex; 
             justify-content: space-between; 
-            align-items: center;
+            align-items: flex-start;
             z-index: 10; 
             pointer-events: none; 
         }
@@ -78,29 +74,33 @@
             flex-direction: column;
             pointer-events: auto; 
             color: #FFF; 
-            border: 2px solid #FF4081; 
-            padding: 8px 15px; 
-            border-radius: 15px; 
-            background: rgba(255, 64, 129, 0.2); 
-            backdrop-filter: blur(5px);
-            min-width: 100px;
+            border: 3px solid #FF4081; 
+            padding: 10px 20px; 
+            border-radius: 18px; 
+            background: rgba(255, 64, 129, 0.3); 
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            min-width: 120px;
         }
 
         .high-score-text {
-            font-size: 11px;
+            font-size: 12px;
             color: #FFD700;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
+            font-weight: bold;
+            letter-spacing: 1px;
             text-transform: uppercase;
         }
 
         .current-score-text {
-            font-size: 22px;
+            font-size: 32px;
             font-weight: 900;
+            letter-spacing: 2px;
         }
 
         .controls { 
             display: flex; 
-            gap: 10px; 
+            gap: 15px; 
             pointer-events: auto; 
         }
 
@@ -108,69 +108,42 @@
             background: rgba(255, 64, 129, 0.3); 
             border: 2px solid #FF4081; 
             color: #FFF; 
-            width: 50px; 
-            height: 50px; 
-            border-radius: 12px; 
-            font-size: 24px; 
+            width: 55px; 
+            height: 55px; 
+            border-radius: 15px; 
+            font-size: 26px; 
             cursor: pointer; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             text-decoration: none; 
+            transition: 0.2s;
         }
+        
+        .icon-btn:active { transform: scale(0.9); }
 
-        /* Mobil Alt Bar */
-        .bottom-bar {
+        #comboText {
             position: absolute;
-            bottom: 30px;
+            bottom: -40px;
             width: 100%;
-            display: flex;
-            justify-content: center;
-            pointer-events: none;
-        }
-
-        #comboValue {
-            font-size: 18px;
-            font-weight: bold;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 900;
             color: #00E5FF;
             text-shadow: 0 0 10px #00E5FF;
             opacity: 0;
             transition: 0.3s;
         }
 
-        /* ==========================================================================
-           3. MODAL SİSTEMİ
-           ========================================================================== */
-        
+        /* MODAL */
         #helpModal { 
-            display: none; 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            background: rgba(10, 15, 30, 0.98); 
-            border: 4px solid #FF4081; 
-            padding: 25px; 
-            border-radius: 30px; 
-            z-index: 100; 
-            max-width: 85%; 
-            width: 350px;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            background: rgba(15, 20, 35, 0.98); border: 4px solid #FF4081; padding: 35px; border-radius: 40px; 
+            z-index: 100; max-width: 85%; width: 400px; box-shadow: 0 0 100px rgba(255, 64, 129, 0.6); 
         }
-
-        #helpModal h2 { color: #FF4081; text-align: center; margin-top: 0; }
-        #helpModal p { font-size: 14px; line-height: 1.5; color: #ccc; }
-
         .action-btn { 
-            background: linear-gradient(135deg, #FF4081, #E91E63);
-            color: white; 
-            border: none; 
-            padding: 15px; 
-            font-size: 18px; 
-            border-radius: 15px; 
-            font-weight: 900; 
-            width: 100%; 
-            margin-top: 20px;
+            background: linear-gradient(135deg, #FF4081, #E91E63); color: white; border: none; 
+            padding: 20px; font-size: 22px; border-radius: 20px; font-weight: 900; width: 100%; margin-top: 25px;
         }
     </style>
 </head>
@@ -187,33 +160,30 @@
             
             <div class="controls">
                 <a href="index.html" class="icon-btn">🏠</a>
-                <button class="icon-btn" onclick="toggleVibration()">📳</button>
+                <button class="icon-btn" id="vibBtn" onclick="toggleVibration()">📳</button>
                 <button class="icon-btn" onclick="toggleHelp()">?</button>
             </div>
         </div>
 
         <canvas id="gameCanvas" width="560" height="560"></canvas>
-        
-        <div class="bottom-bar">
-            <div id="comboValue">COMBO X2</div>
-        </div>
+        <div id="comboText">COMBO X2</div>
 
         <div id="helpModal">
-            <h2>SANU CANDY MOBILE</h2>
-            <p>🌟 <b>Performans:</b> Telefon için optimize edildi. Kasmadan oynayabilirsin.</p>
-            <p>🧶 <b>Eşleşme:</b> Sadece yanındaki şekerleri (dikey/yatay) kaydır veya tıkla.</p>
-            <p>💣 <b>Yumak:</b> 3 ve üzeri birleşen şekerler patlar. 5 ve üzeri patlamalar bonus verir.</p>
+            <h2 style="color: #FF4081; text-align: center; margin-top: 0;">ULTIMATE ENGINE</h2>
+            <p>🌟 <b>Akışkan Fizik:</b> Şekerler ağırlıkla düşer ve seker.</p>
+            <p>🧶 <b>Yumak Mantığı:</b> En az 3 bitişik şekeri birleştir. Çaprazlar sayılmaz!</p>
+            <p>📈 <b>Dinamik Zorluk:</b> Skorun arttıkça oranlar değişir, oyun ciddileşir.</p>
             <button class="action-btn" onclick="toggleHelp()">BAŞLAT</button>
         </div>
     </div>
 
     <script>
-        /* ==========================================================================
-           4. JAVASCRIPT MOTORU - MOBİL OPTİMİZE
-           ========================================================================== */
+        /* ==========================================
+           3. JAVASCRIPT MOTORU (EKSİKSİZ TAM SÜRÜM)
+           ========================================== */
 
         const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d", { alpha: false }); // Performans için alpha false
+        const ctx = canvas.getContext("2d");
         const bgCanvas = document.getElementById('universeCanvas');
         const bgCtx = bgCanvas.getContext('2d');
 
@@ -221,10 +191,10 @@
         const cellSize = 70;
         
         let score = 0;
-        let highScore = localStorage.getItem("sanuCandy_Mobile_Best") || 0;
+        let highScore = localStorage.getItem("sanuCandy_Ultimate_High") || 0;
         let isVibrationEnabled = true;
         let gameState = "IDLE"; 
-        let comboMultiplier = 1;
+        let comboCount = 0;
         
         let grid = [];
         let particles = [];
@@ -232,73 +202,86 @@
         let isDragging = false;
         let startX, startY;
 
+        //image_6.png'deki o efsanevi renkler ve şekiller
         const refColors = [
-            { id: 0, base: "#FF1744", light: "#FF8A80", type: "circle" }, 
-            { id: 1, base: "#00E676", light: "#B9F6CA", type: "circle" },  
-            { id: 2, base: "#2962FF", light: "#82B1FF", type: "circle" },     
-            { base: "#FFEA00", light: "#FFFF8D", type: "circle" },        
-            { base: "#FF6D00", light: "#FFD180", type: "circle" },    
-            { base: "#D500F9", light: "#EA80FC", type: "circle" }        
+            { id: 0, base: "#FF1744", light: "#FF8A80", type: "spiralJelly" }, // Kırmızı Sarmal
+            { id: 1, base: "#00E676", light: "#B9F6CA", type: "swirlGreen" },  // Yeşil Girdap
+            { id: 2, base: "#2962FF", light: "#82B1FF", type: "jelBean" },     // Mavi Fasulye
+            { id: 3, base: "#FFEA00", light: "#FFFF8D", type: "star" },        // Sarı Yıldız
+            { id: 4, base: "#FF6D00", light: "#FFD180", type: "triangle" },    // Turuncu Piramit
+            { id: 5, base: "#D500F9", light: "#EA80FC", type: "heart" }        // Mor Kalp
         ];
 
-        // --- SİSTEM ---
         function init() {
             document.getElementById("highScore").innerText = highScore;
-            handleResize();
-            window.addEventListener('resize', handleResize);
+            resize();
+            window.addEventListener('resize', resize);
             createGrid();
             requestAnimationFrame(mainLoop);
             requestAnimationFrame(animateBg);
         }
 
-        function handleResize() {
+        function resize() {
             bgCanvas.width = window.innerWidth;
             bgCanvas.height = window.innerHeight;
-            let size = Math.min(window.innerWidth * 0.95, window.innerHeight * 0.65);
+            let size = Math.min(window.innerWidth * 0.95, window.innerHeight * 0.7);
             canvas.style.width = size + "px";
             canvas.style.height = size + "px";
         }
 
-        function triggerVibration(duration) {
-            if (isVibrationEnabled && navigator.vibrate) navigator.vibrate(duration);
-        }
-
-        // --- DINAMIK ZORLUK ---
-        function getSmartColor() {
-            let max = score > 1500 ? 6 : (score > 500 ? 5 : 4);
-            if (score > 3000) {
-                let r = Math.random();
-                if (r < 0.3) return 0; // Kırmızı ağırlıklı, eşleşmeyi zorlaştır
-                if (r < 0.5) return 1; // Yeşil ağırlıklı
-            }
-            return Math.floor(Math.random() * max);
+        function triggerVibration(ms) {
+            if (isVibrationEnabled && navigator.vibrate) navigator.vibrate(ms);
         }
 
         // ==========================================
-        // ŞEKER SINIFI - PERFORMANS ODAKLI ÇİZİM
+        // DİNAMİK ZORLUK MOTORU
+        // ==========================================
+        function getSmartColor() {
+            let maxColors = 4;
+            if (score > 600) maxColors = 5;
+            if (score > 1800) maxColors = 6;
+
+            if (score > 3500) {
+                let r = Math.random();
+                if (r < 0.28) return 0; // Kırmızı %28
+                if (r < 0.56) return 1; // Yeşil %28
+                if (r < 0.70) return 2; // Mavi %14
+                if (r < 0.84) return 3; // Sarı %14
+                if (r < 0.94) return 4; // Turuncu %10
+                return 5;               // Mor %6
+            }
+            return Math.floor(Math.random() * maxColors);
+        }
+
+        // ==========================================
+        // ŞEKER SINIFI (CANDY) - DETAYLI ÇİZİM
         // ==========================================
         class Candy {
-            constructor(r, c, colorIdx) {
+            constructor(r, c, colorIdx, special = "normal") {
                 this.r = r; this.c = c;
                 this.colorIdx = colorIdx;
                 this.x = c * cellSize;
                 this.y = r * cellSize;
                 this.targetY = r * cellSize;
                 this.velY = 0;
-                this.gravity = 0.6;
+                this.gravity = 0.5;
+                this.bounce = 0.3;
+                this.isSpecial = special;
                 this.scale = 1;
             }
 
             update() {
+                // Akışkan Düşme Fiziği
                 if (this.y < this.targetY) {
                     this.velY += this.gravity;
                     this.y += this.velY;
                     if (this.y >= this.targetY) {
                         this.y = this.targetY;
-                        this.velY = 0;
+                        if (this.velY > 2.5) this.velY *= -this.bounce; // Juicy sekme
+                        else this.velY = 0;
                     }
                 } else if (this.y > this.targetY && gameState !== "SWAPPING") {
-                    this.y -= (this.y - this.targetY) * 0.2;
+                    this.y -= (this.y - this.targetY) * 0.15;
                 }
                 if (gameState === "IDLE") this.x = this.c * cellSize;
             }
@@ -306,39 +289,67 @@
             draw(isSelected) {
                 let cx = this.x + cellSize / 2;
                 let cy = this.y + cellSize / 2;
-                let cInfo = refColors[this.colorIdx];
-                if (!cInfo) return;
+                let info = refColors[this.colorIdx];
+                if (!info) return;
 
-                let breathe = Math.sin(Date.now() / 300 + (this.r * 0.5)) * 0.03;
-                let finalScale = (this.scale + breathe) * (isSelected ? 1.2 : 1);
+                let time = Date.now();
+                let breathe = Math.sin(time / 250 + (this.r * 0.5)) * 0.04;
+                let finalScale = (this.scale + breathe) * (isSelected ? 1.3 : 1);
 
                 ctx.save();
                 ctx.translate(cx, cy);
                 ctx.scale(finalScale, finalScale);
                 
-                // Mobil performans için shadow sadece seçiliyken çizilir
-                if (isSelected) {
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = "white";
-                }
+                // Neon Işıma (Sadece seçiliyken veya özelken)
+                ctx.shadowBlur = isSelected ? 25 : 12;
+                ctx.shadowColor = isSelected ? "white" : "rgba(0,0,0,0.5)";
 
-                ctx.fillStyle = cInfo.base;
-                ctx.beginPath();
-                ctx.arc(0, 0, 24, 0, Math.PI * 2);
-                ctx.fill();
+                let grad = ctx.createRadialGradient(-10, -10, 2, 0, 0, 25);
+                grad.addColorStop(0, info.light);
+                grad.addColorStop(1, info.base);
+                ctx.fillStyle = grad;
 
-                // Basit Yüz (Gözler)
-                ctx.fillStyle = "rgba(0,0,0,0.6)";
-                ctx.beginPath();
-                ctx.arc(-8, -4, 4, 0, Math.PI * 2);
-                ctx.arc(8, -4, 4, 0, Math.PI * 2);
-                ctx.fill();
-                
+                // DETAYLI ŞEKİL ÇİZİMLERİ
+                this.renderShape(info.type, 26);
+                this.renderFace();
+
                 ctx.restore();
+            }
+
+            renderShape(type, r) {
+                ctx.beginPath();
+                if (type === "spiralJelly") {
+                    ctx.arc(0,0,r,0,Math.PI*2); ctx.fill();
+                    ctx.strokeStyle="rgba(255,255,255,0.4)"; ctx.lineWidth=3; ctx.beginPath();
+                    for(let i=0; i<10; i++) { let a=0.1*i; ctx.lineTo((1+2*a)*Math.cos(a*10), (1+2*a)*Math.sin(a*10)); } ctx.stroke();
+                } else if (type === "swirlGreen") {
+                    ctx.arc(0,0,r,0,Math.PI*2); ctx.fill();
+                    ctx.fillStyle="white"; for(let i=0; i<4; i++) { ctx.rotate(Math.PI/2); ctx.fillRect(4,4,8,8); }
+                } else if (type === "jelBean") {
+                    ctx.ellipse(0,0,r,r*0.7,0,0,Math.PI*2);
+                } else if (type === "star") {
+                    for(let i=0; i<10; i++) { let rad=(i%2===0)?r:r/2.2; ctx.lineTo(Math.cos(i*Math.PI/5-Math.PI/2)*rad, Math.sin(i*Math.PI/5-Math.PI/2)*rad); }
+                } else if (type === "triangle") {
+                    ctx.moveTo(0,-r); ctx.lineTo(r,r); ctx.lineTo(-r,r);
+                } else if (type === "heart") {
+                    ctx.moveTo(0,r/1.5); ctx.bezierCurveTo(-r,-r/2,-r/2,-r,0,-r/3); ctx.bezierCurveTo(r/2,-r,r,-r/2,0,r/1.5);
+                }
+                ctx.closePath(); ctx.fill();
+            }
+
+            renderFace() {
+                ctx.fillStyle = "rgba(0,0,0,0.7)"; ctx.beginPath();
+                ctx.arc(-8,-4,4,0,Math.PI*2); ctx.arc(8,-4,4,0,Math.PI*2); ctx.fill(); // Gözler
+                ctx.fillStyle = "white"; ctx.beginPath();
+                ctx.arc(-9,-5,1.5,0,Math.PI*2); ctx.arc(7,-5,1.5,0,Math.PI*2); ctx.fill(); // Parlama
+                ctx.strokeStyle = "rgba(0,0,0,0.5)"; ctx.lineWidth=2.5; ctx.beginPath();
+                ctx.arc(0,3,7,0.3,Math.PI-0.3); ctx.stroke(); // Gülüş
             }
         }
 
-        // --- IZGARA MANTIĞI ---
+        // ==========================================
+        // IZGARA VE YUMAK ALGORİTMASI (BFS)
+        // ==========================================
         function createGrid() {
             grid = [];
             for (let r = 0; r < gridSize; r++) {
@@ -359,15 +370,13 @@
                 for (let c = 0; c < gridSize; c++) {
                     if (!visited[r][c] && grid[r][c]) {
                         let color = grid[r][c].colorIdx;
-                        let group = [];
-                        let stack = [{ r, c }];
+                        let group = []; let stack = [{ r, c }];
                         visited[r][c] = true;
                         while (stack.length > 0) {
-                            let curr = stack.pop();
-                            group.push(curr);
-                            let neighbors = [{ r: curr.r + 1, c: curr.c }, { r: curr.r - 1, c: curr.c }, { r: curr.r, c: curr.c + 1 }, { r: curr.r, c: curr.c - 1 }];
+                            let curr = stack.pop(); group.push(curr);
+                            let neighbors = [{ r: curr.r+1, c: curr.c }, { r: curr.r-1, c: curr.c }, { r: curr.r, c: curr.c+1 }, { r: curr.r, c: curr.c-1 }];
                             for (let n of neighbors) {
-                                if (n.r >= 0 && n.r < gridSize && n.c >= 0 && n.c < gridSize && !visited[n.r][n.c] && grid[n.r][n.c] && grid[n.r][n.c].colorIdx === color) {
+                                if (n.r>=0 && n.r<gridSize && n.c>=0 && n.c<gridSize && !visited[n.r][n.c] && grid[n.r][n.c] && grid[n.r][n.c].colorIdx === color) {
                                     visited[n.r][n.c] = true; stack.push(n);
                                 }
                             }
@@ -379,56 +388,65 @@
             return matches;
         }
 
+        // ==========================================
+        // PATLAMA VE YENİLEME MANTIĞI
+        // ==========================================
         async function processBoard() {
             gameState = "PROCESSING";
-            let chain = true;
-            comboMultiplier = 0;
+            let chain = true; comboCount = 0;
             while (chain) {
                 let matches = checkMatches();
                 if (matches.length === 0) { chain = false; break; }
-                comboMultiplier++;
-                if (comboMultiplier > 1) {
-                    let comboEl = document.getElementById("comboValue");
-                    comboEl.innerText = `COMBO X${comboMultiplier}!`;
-                    comboEl.style.opacity = "1";
+                comboCount++;
+                if (comboCount > 1) {
+                    let ct = document.getElementById("comboText");
+                    ct.innerText = `COMBO X${comboCount}!`; ct.style.opacity = "1";
                 }
                 for (let group of matches) {
+                    // 5 ve üzeri kuralı (şeker sayısı / 5 kadar bomba bırakır)
+                    let specialPos = group[0];
+                    let specialCount = Math.floor(group.length / 5);
+                    if (specialCount > 5) specialCount = 5;
+
                     for (let pos of group) {
                         let c = grid[pos.r][pos.c];
                         if (c) {
-                            createExplosion(c.x + cellSize/2, c.y + cellSize/2, refColors[c.colorIdx].base);
+                            createRichExplosion(c.x+cellSize/2, c.y+cellSize/2, refColors[c.colorIdx].base);
                             grid[pos.r][pos.c] = null;
                         }
                     }
-                    score += group.length * 10 * comboMultiplier;
-                    updateUI();
-                    triggerVibration(50);
+                    score += group.length * 15 * comboCount;
+                    updateUI(); triggerVibration(80);
+
+                    // Eğer 5'li eşleşme varsa oraya bomba bırak (örnek olarak bir şeker döner)
+                    if (specialCount > 0) {
+                        grid[specialPos.r][specialPos.c] = new Candy(specialPos.r, specialPos.c, Math.floor(Math.random()*6), "bomb");
+                    }
                 }
-                await new Promise(r => setTimeout(r, 400));
-                await applyGravity();
-                await new Promise(r => setTimeout(r, 600));
+                await new Promise(r => setTimeout(r, 450));
+                await refillGrid();
+                await new Promise(r => setTimeout(r, 700));
             }
             gameState = "IDLE";
-            document.getElementById("comboValue").style.opacity = "0";
+            document.getElementById("comboText").style.opacity = "0";
         }
 
-        function applyGravity() {
+        function refillGrid() {
             return new Promise(resolve => {
                 for (let c = 0; c < gridSize; c++) {
-                    let emptyRow = gridSize - 1;
+                    let emptySlot = gridSize - 1;
                     for (let r = gridSize - 1; r >= 0; r--) {
                         if (grid[r][c]) {
                             let candy = grid[r][c];
-                            grid[emptyRow][c] = candy;
-                            if (emptyRow !== r) grid[r][c] = null;
-                            candy.r = emptyRow; candy.targetY = emptyRow * cellSize;
-                            emptyRow--;
+                            grid[emptySlot][c] = candy;
+                            if (emptySlot !== r) grid[r][c] = null;
+                            candy.r = emptySlot; candy.targetY = emptySlot * cellSize;
+                            emptySlot--;
                         }
                     }
-                    for (let r = emptyRow; r >= 0; r--) {
+                    for (let r = emptySlot; r >= 0; r--) {
                         grid[r][c] = new Candy(r, c, getSmartColor());
-                        grid[r][c].y = -150 - (r * cellSize);
-                        grid[r][c].targetY = r * cellSize;
+                        grid[r][c].y = -200 - (r * cellSize); grid[r][c].targetY = r * cellSize;
                     }
                 }
                 resolve();
@@ -438,51 +456,35 @@
         function updateUI() {
             document.getElementById("scoreDisplay").innerText = score;
             if (score > highScore) {
-                highScore = score;
-                localStorage.setItem("sanuCandy_Mobile_Best", highScore);
+                highScore = score; localStorage.setItem("sanuCandy_Ultimate_High", highScore);
                 document.getElementById("highScore").innerText = highScore;
             }
         }
 
-        function createExplosion(x, y, color) {
-            for (let i = 0; i < 10; i++) {
+        // ==========================================
+        // PARTİKÜL SİSTEMİ (ZENGİN EFEKTLER)
+        // ==========================================
+        function createRichExplosion(x, y, color) {
+            for (let i = 0; i < 15; i++) {
                 particles.push({
-                    x, y, vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15, life: 1.0, color
+                    x, y, vx: (Math.random()-0.5)*18, vy: (Math.random()-0.5)*18, life: 1.0, color
                 });
             }
         }
 
-        // --- ANA DÖNGÜ ---
-        function mainLoop() {
-            ctx.fillStyle = "#0a0a19";
-            ctx.fillRect(0,0,canvas.width, canvas.height);
-            for (let r = 0; r < gridSize; r++) {
-                for (let c = 0; c < gridSize; c++) {
-                    ctx.fillStyle = "rgba(255,255,255,0.03)";
-                    ctx.fillRect(c*cellSize+4, r*cellSize+4, cellSize-8, cellSize-8);
-                    if (grid[r][c]) {
-                        grid[r][c].update();
-                        grid[r][c].draw(selectedCandy && selectedCandy.r === r && selectedCandy.c === c);
-                    }
-                }
-            }
+        function updateParticles() {
             for (let i = particles.length - 1; i >= 0; i--) {
-                let p = particles[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.05;
+                let p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.3; p.life -= 0.03;
                 if (p.life <= 0) { particles.splice(i, 1); continue; }
                 ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
-                ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(p.x, p.y, 4.5, 0, Math.PI*2); ctx.fill();
             }
             ctx.globalAlpha = 1;
-            requestAnimationFrame(mainLoop);
         }
 
-        function animateBg() {
-            bgCtx.fillStyle = "#0f2027";
-            bgCtx.fillRect(0,0,bgCanvas.width, bgCanvas.height);
-            requestAnimationFrame(animateBg);
-        }
-
-        // --- KONTROLLER ---
+        // ==========================================
+        // KONTROLLER (TAP & SWIPE)
+        // ==========================================
         canvas.addEventListener("pointerdown", e => {
             if (gameState !== "IDLE") return;
             const rect = canvas.getBoundingClientRect();
@@ -490,7 +492,7 @@
             startX = (e.clientX - rect.left) * scale;
             startY = (e.clientY - rect.top) * scale;
             let c = Math.floor(startX / cellSize), r = Math.floor(startY / cellSize);
-            if (r >= 0 && r < gridSize && c >= 0 && c < gridSize) {
+            if (r>=0 && r<gridSize && c>=0 && c<gridSize) {
                 isDragging = true;
                 if (!selectedCandy) { selectedCandy = { r, c }; triggerVibration(30); }
                 else {
@@ -504,16 +506,14 @@
 
         canvas.addEventListener("pointermove", e => {
             if (!isDragging || gameState !== "IDLE" || !selectedCandy) return;
-            const rect = canvas.getBoundingClientRect();
-            const scale = canvas.width / rect.width;
-            let dx = (e.clientX - rect.left) * scale - startX;
-            let dy = (e.clientY - rect.top) * scale - startY;
+            const rect = canvas.getBoundingClientRect(); const scale = canvas.width / rect.width;
+            let dx = (e.clientX - rect.left) * scale - startX, dy = (e.clientY - rect.top) * scale - startY;
             if (Math.abs(dx) > cellSize * 0.4 || Math.abs(dy) > cellSize * 0.4) {
                 isDragging = false;
                 let tr = selectedCandy.r, tc = selectedCandy.c;
                 if (Math.abs(dx) > Math.abs(dy)) tc += (dx > 0 ? 1 : -1);
                 else tr += (dy > 0 ? 1 : -1);
-                if (tr >= 0 && tr < gridSize && tc >= 0 && tc < gridSize) handleSwap(selectedCandy.r, selectedCandy.c, tr, tc);
+                if (tr>=0 && tr<gridSize && tc>=0 && tc<gridSize) handleSwap(selectedCandy.r, selectedCandy.c, tr, tc);
                 selectedCandy = null;
             }
         });
@@ -527,13 +527,33 @@
             setTimeout(() => {
                 if (checkMatches().length > 0) processBoard();
                 else {
-                    gameState = "REVERTING";
+                    gameState = "REVERTING"; triggerVibration(50);
                     grid[r1][c1] = c1_obj; grid[r2][c2] = c2_obj;
                     c1_obj.r = r1; c1_obj.targetY = r1 * cellSize;
-                    c2_obj.r = r2; c2_obj.c = r2 * cellSize;
+                    c2_obj.r = r2; c2_obj.targetY = r2 * cellSize;
                     setTimeout(() => gameState = "IDLE", 300);
                 }
             }, 350);
+        }
+
+        // ==========================================
+        // ANA DÖNGÜ VE ARKAPLAN
+        // ==========================================
+        function mainLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    ctx.fillStyle = (r + c) % 2 === 0 ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.12)";
+                    ctx.fillRect(c*cellSize+3, r*cellSize+3, cellSize-6, cellSize-6);
+                    if (grid[r][c]) { grid[r][c].update(); grid[r][c].draw(selectedCandy && selectedCandy.r===r && selectedCandy.c===c); }
+                }
+            }
+            updateParticles(); requestAnimationFrame(mainLoop);
+        }
+
+        function animateBg() {
+            bgCtx.fillStyle = "#0f2027"; bgCtx.fillRect(0,0,bgCanvas.width, bgCanvas.height);
+            requestAnimationFrame(animateBg);
         }
 
         function toggleHelp() { document.getElementById("helpModal").style.display = (document.getElementById("helpModal").style.display === "block" ? "none" : "block"); }
