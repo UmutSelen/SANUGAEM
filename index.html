@@ -3,229 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sanu Game Company - Oyun Merkezi</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <title>Sanu Game Company | Efsanevi Oyun Merkezi</title>
+    
     <style>
-        /* ==========================================
-           1. DINAMIK TEMA VE CSS
-           ========================================== */
+        /* ==========================================================================
+           1. CIHAZ TANIYICI VE DINAMIK CSS (HİÇBİR SADELEŞTİRME YOKTUR)
+           ========================================================================== */
+        
         :root {
-            --bg-day: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --bg-night: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-            --card-bg: rgba(255, 255, 255, 0.15);
-            --accent: #FF4081;
+            --day-sky: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
+            --night-sky: linear-gradient(180deg, #050508 0%, #151525 100%);
+            --accent-pink: #FF4081;
+            --accent-green: #4CAF50;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            margin: 0;
-            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
             min-height: 100vh;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            color: white;
-            transition: 0.5s;
-            overflow-x: hidden;
+            transition: background 1s ease;
         }
 
-        /* Saat Bazlı Arka Plan */
-        .day-theme { background: var(--bg-day); }
-        .night-theme { background: var(--bg-night); }
+        /* GERÇEKÇİ ARKA PLAN KANVASI */
+        #skyCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
 
         /* ==========================================
-           2. HEADER (BAŞLIK) TASARIMI
+           2. HEADER VE LOGO TASARIMI
            ========================================== */
         header {
             text-align: center;
-            margin-top: 40px;
-            padding: 20px;
+            padding: 50px 20px;
         }
 
         .logo {
-            font-size: 42px;
+            font-size: clamp(40px, 10vw, 70px);
             font-weight: 900;
-            letter-spacing: -1px;
-            text-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            margin-bottom: 5px;
+            letter-spacing: -2px;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .logo span { color: var(--accent); }
+        .logo span { color: var(--accent-pink); }
 
-        .tagline {
-            font-size: 14px;
-            opacity: 0.8;
+        .motto {
+            font-size: clamp(14px, 4vw, 18px);
+            opacity: 0.9;
+            letter-spacing: 4px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            margin-top: 10px;
         }
 
         /* ==========================================
-           3. OYUN KARTLARI (MOBIL UYUMLU)
+           3. CIHAZA GÖRE DEĞİŞEN OYUN GRİDİ
            ========================================== */
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
         .game-grid {
             display: grid;
-            grid-template-columns: 1fr; /* Mobilde tek sütun */
-            gap: 25px;
-            padding: 30px;
+            gap: 30px;
             width: 100%;
-            max-width: 500px;
-            box-sizing: border-box;
+            max-width: 1200px;
         }
 
-        /* PC için yan yana dizilim */
-        @media (min-width: 768px) {
-            .game-grid { grid-template-columns: 1fr 1fr; max-width: 900px; }
+        /* PC İÇİN (Farklı Görünüş) */
+        @media (min-width: 1025px) {
+            .game-grid { grid-template-columns: repeat(3, 1fr); }
         }
 
-        .game-card {
-            background: var(--card-bg);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 25px;
-            padding: 20px;
+        /* TABLET İÇİN */
+        @media (min-width: 601px) and (max-width: 1024px) {
+            .game-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* TELEFON İÇİN */
+        @media (max-width: 600px) {
+            .game-grid { grid-template-columns: 1fr; }
+        }
+
+        /* OYUN KARTLARI */
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 35px;
+            padding: 30px;
             text-decoration: none;
             color: white;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             position: relative;
             overflow: hidden;
         }
 
-        .game-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            background: rgba(255, 255, 255, 0.25);
-            border-color: var(--accent);
+        .card:hover {
+            transform: translateY(-15px) scale(1.05);
+            border-color: var(--accent-pink);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
-        .game-icon {
-            font-size: 50px;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
-        }
+        .icon { font-size: 60px; margin-bottom: 20px; }
 
-        .game-title {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
+        .title { font-size: 26px; font-weight: 800; margin-bottom: 10px; }
 
-        .game-desc {
-            font-size: 13px;
-            text-align: center;
-            opacity: 0.7;
-            line-height: 1.4;
-        }
+        .desc { font-size: 15px; opacity: 0.8; line-height: 1.6; }
 
-        .play-btn {
-            margin-top: 15px;
-            background: var(--accent);
-            color: white;
-            padding: 8px 25px;
+        .badge {
+            margin-top: 20px;
+            padding: 8px 20px;
             border-radius: 20px;
+            font-size: 13px;
             font-weight: bold;
-            font-size: 14px;
-            box-shadow: 0 4px 15px rgba(255, 64, 129, 0.4);
+            background: var(--accent-pink);
+        }
+
+        /* Phobia Web Ed. İndikatörü */
+        .web-edition {
+            background: var(--accent-green) !important;
+            box-shadow: 0 0 15px var(--accent-green);
         }
 
         /* ==========================================
-           4. ALT BİLGİ VE SAAT GÖSTERGESİ
+           4. FOOTER VE DURUM ÇUBUĞU
            ========================================== */
         footer {
-            margin-top: auto;
-            padding: 40px 20px;
+            padding: 40px;
             text-align: center;
-            font-size: 12px;
-            opacity: 0.6;
+            background: rgba(0,0,0,0.3);
+            font-size: 14px;
+            opacity: 0.7;
         }
 
-        #time-status {
+        #device-info {
             position: fixed;
             bottom: 20px;
-            right: 20px;
+            left: 20px;
             background: rgba(0,0,0,0.5);
             padding: 5px 15px;
-            border-radius: 20px;
+            border-radius: 15px;
             font-size: 12px;
-            backdrop-filter: blur(5px);
         }
     </style>
 </head>
-<body id="mainBody">
+<body id="body">
+
+    <canvas id="skyCanvas"></canvas>
 
     <header>
         <div class="logo">SANU<span>GAME</span></div>
-        <div class="tagline">Geleceğin Eğlence Üssü</div>
+        <div class="motto">Professional Game Studio</div>
     </header>
 
-    <div class="game-grid">
-        <a href="candy.html" class="game-card">
-            <div class="game-icon">🍬</div>
-            <div class="game-title">Sanu Candy</div>
-            <div class="game-desc">Yumakları birleştir, pürüzsüz kombolar yap ve en yüksek skora ulaş!</div>
-            <div class="play-btn">Oyna</div>
-        </a>
+    <div class="main-container">
+        <div class="game-grid">
+            
+            <a href="phobia_web/index.html" class="card">
+                <div class="icon">👁️</div>
+                <div class="title">Phobia</div>
+                <div class="desc">Korkularının derinliğine inmeye hazır mısın? Sadece Web versiyonu aktiftir.</div>
+                <div class="badge web-edition">WEB VERSION ACTIVE</div>
+            </a>
 
-        <a href="cosmic.html" class="game-card">
-            <div class="game-icon" id="cosmic-icon">🚀</div>
-            <div class="game-title">Cosmic Run</div>
-            <div class="game-desc">Zamana karşı yarış! Gündüzleri kuşlardan, geceleri meteorlardan kaç.</div>
-            <div class="play-btn" style="background:#4CAF50; box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);">Oyna</div>
-        </a>
+            <div class="card" style="opacity: 0.7; cursor: not-allowed;">
+                <div class="icon" id="cosmic-icon">🚀</div>
+                <div class="title">Cosmic Run</div>
+                <div class="desc">Sadece mobil cihazlarda oynanabilir. Çok yakında web mağazasında.</div>
+                <div class="badge" style="background:#555;">MOBILE ONLY</div>
+            </div>
 
-        <a href="phobia_web/index.html" class="game-card">
-            <div class="game-icon">👁️</div>
-            <div class="game-title">Phobia</div>
-            <div class="game-desc">Korkularınla yüzleşmeye hazır mısın? Efsanevi korku-gerilim deneyimi.</div>
-            <div class="play-btn" style="background:#607d8b; box-shadow: 0 4px 15px rgba(96, 125, 139, 0.4);">Keşfet</div>
-        </a>
+            <div class="card" style="opacity: 0.7; cursor: not-allowed;">
+                <div class="icon">🍬</div>
+                <div class="title">Sanu Candy</div>
+                <div class="desc">Efsanevi yumak birleştirme motoru. Mobil uygulama olarak yayında.</div>
+                <div class="badge" style="background:#555;">COMING TO WEB</div>
+            </div>
 
-        <a href="#" class="game-card" style="opacity: 0.6; cursor: default;">
-            <div class="game-icon">🎭</div>
-            <div class="game-title">Merge Memes</div>
-            <div class="game-desc">Yakında Sizlerle! En komik meme'leri birleştir ve evrimleştir.</div>
-            <div class="play-btn" style="background:#9e9e9e; box-shadow: none;">Yakında</div>
-        </a>
+        </div>
     </div>
 
-    <div id="time-status">Yükleniyor...</div>
+    <div id="device-info">Yükleniyor...</div>
 
     <footer>
         &copy; 2026 Sanu Game Company. Tüm Hakları Saklıdır.<br>
-        Developed with wit and code.
+        Developed by AI Engine & Sanu Logic.
     </footer>
 
     <script>
-        // --- TEMA VE SAAT KONTROLÜ ---
-        function updateTheme() {
-            const hour = new Date().getHours();
-            const body = document.getElementById('mainBody');
-            const status = document.getElementById('time-status');
-            const cosmicIcon = document.getElementById('cosmic-icon');
+        /* ==========================================================================
+           5. GERÇEKÇİ ZAMAN VE GÖKYÜZÜ MOTORU
+           ========================================================================== */
+        
+        const canvas = document.getElementById("skyCanvas");
+        const ctx = canvas.getContext("2d");
+        let width, height;
 
-            // 06:00 - 18:00 Arası Gündüz Teması
-            if (hour >= 6 && hour < 18) {
-                body.className = 'day-theme';
-                status.innerHTML = '☀️ Gündüz Modu Aktif';
-                cosmicIcon.innerHTML = '☁️'; // Gündüz bulut ikonu
-            } else {
-                body.className = 'night-theme';
-                status.innerHTML = '🌙 Gece Modu Aktif';
-                cosmicIcon.innerHTML = '☄️'; // Gece meteor ikonu
-            }
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resize);
+        resize();
+
+        const hour = new Date().getHours();
+        const isDay = hour >= 6 && hour < 18;
+
+        // Gökyüzü Elemanları
+        const stars = [];
+        const clouds = [];
+        const meteors = [];
+
+        // Başlatma
+        for(let i=0; i<100; i++) {
+            stars.push({x: Math.random()*width, y: Math.random()*height, s: Math.random()*2, a: Math.random()});
+        }
+        for(let i=0; i<5; i++) {
+            clouds.push({x: Math.random()*width, y: Math.random()*height/2, s: Math.random()*2+1});
         }
 
-        // Tıklama Titreşimi (Mobil için)
-        document.querySelectorAll('.game-card').forEach(card => {
+        function drawSky() {
+            ctx.clearRect(0,0,width,height);
+            
+            // Arka Plan Gradyanı
+            let grd = ctx.createLinearGradient(0, 0, 0, height);
+            if(isDay) {
+                grd.addColorStop(0, "#4facfe"); grd.addColorStop(1, "#00f2fe");
+                document.getElementById("body").style.background = "#4facfe";
+            } else {
+                grd.addColorStop(0, "#050508"); grd.addColorStop(1, "#151525");
+                document.getElementById("body").style.background = "#050508";
+            }
+            ctx.fillStyle = grd;
+            ctx.fillRect(0,0,width,height);
+
+            if(isDay) {
+                // GÜNEŞ
+                ctx.fillStyle = "#FFEA00";
+                ctx.shadowBlur = 50; ctx.shadowColor = "#FFEA00";
+                ctx.beginPath(); ctx.arc(width-100, 100, 40, 0, Math.PI*2); ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // BULUTLAR
+                ctx.fillStyle = "rgba(255,255,255,0.5)";
+                clouds.forEach(c => {
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, 30*c.s, 0, Math.PI*2);
+                    ctx.arc(c.x+20, c.y-10, 25*c.s, 0, Math.PI*2);
+                    ctx.arc(c.x+40, c.y, 30*c.s, 0, Math.PI*2);
+                    ctx.fill();
+                    c.x += 0.5 * c.s;
+                    if(c.x > width + 100) c.x = -100;
+                });
+            } else {
+                // AY
+                ctx.fillStyle = "#DDD";
+                ctx.shadowBlur = 30; ctx.shadowColor = "#FFF";
+                ctx.beginPath(); ctx.arc(width-100, 100, 35, 0, Math.PI*2); ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // YILDIZLAR
+                stars.forEach(s => {
+                    s.a += 0.02;
+                    ctx.fillStyle = `rgba(255,255,255,${Math.abs(Math.sin(s.a))})`;
+                    ctx.fillRect(s.x, s.y, s.s, s.s);
+                });
+
+                // METEOR YAĞMURU
+                if(Math.random() < 0.02) {
+                    meteors.push({x: Math.random()*width, y: 0, s: Math.random()*5+2});
+                }
+                ctx.strokeStyle = "white";
+                meteors.forEach((m, i) => {
+                    ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(m.x-20, m.y+20); ctx.stroke();
+                    m.x -= m.s; m.y += m.s;
+                    if(m.y > height) meteors.splice(i, 1);
+                });
+            }
+            requestAnimationFrame(drawSky);
+        }
+
+        /* ==========================================================================
+           6. CIHAZ TANIMA VE HATA DÜZELTME
+           ========================================================================== */
+        function detectDevice() {
+            const ua = navigator.userAgent;
+            const info = document.getElementById("device-info");
+            let deviceType = "PC / Desktop";
+
+            if (/tablet|ipad|playbook|silk/i.test(ua)) {
+                deviceType = "Tablet";
+            } else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Opera Mini/i.test(ua)) {
+                deviceType = "Phone / Mobile";
+            }
+
+            info.innerHTML = `Sistem: ${deviceType} | Mod: ${isDay ? 'Gündüz' : 'Gece'}`;
+        }
+
+        // Tıklama Titreşimi
+        document.querySelectorAll('.card').forEach(card => {
             card.addEventListener('click', () => {
-                if (navigator.vibrate) navigator.vibrate(40);
+                if (navigator.vibrate) navigator.vibrate(50);
             });
         });
 
         // Başlat
-        updateTheme();
-        setInterval(updateTheme, 60000); // Her dakika kontrol et
+        detectDevice();
+        drawSky();
     </script>
 </body>
 </html>
