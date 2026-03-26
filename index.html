@@ -7,16 +7,20 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     
-    <title>Sanu Game Company | Efsanevi Oyun Merkezi</title>
+    <title>Sanu Game Company | Efsanevi Piksel Dünyası</title>
     
     <style>
         /* ==========================================================================
-           1. CIHAZ TANIYICI VE DINAMIK CSS (HİÇBİR SADELEŞTİRME YOKTUR)
+           1. HIGH-END PIXEL ART CSS VE TEMA (EKSİKSİZ)
            ========================================================================== */
         
         :root {
-            --day-sky: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
-            --night-sky: linear-gradient(180deg, #050508 0%, #151525 100%);
+            /* Piksel Paleti */
+            --sky-day-1: #4facfe; --sky-day-2: #00f2fe;
+            --sky-night-1: #050508; --sky-night-2: #151525;
+            --pixel-cloud: rgba(255, 255, 255, 0.7);
+            --pixel-sun: #FFEA00;
+            --pixel-moon: #DDDDDD;
             --accent-pink: #FF4081;
             --accent-green: #4CAF50;
         }
@@ -24,7 +28,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
             color: white;
             min-height: 100vh;
             overflow-x: hidden;
@@ -33,29 +37,30 @@
             transition: background 1s ease;
         }
 
-        /* GERÇEKÇİ ARKA PLAN KANVASI */
-        #skyCanvas {
+        /* DETAYLI PIXEL ART KANVASI */
+        #pixelSkyCanvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
             z-index: -1;
+            image-rendering: pixelated; /* Piksel keskinliği */
         }
 
         /* ==========================================
-           2. HEADER VE LOGO TASARIMI
+           2. BAŞLIK VE LOGO TASARIMI
            ========================================== */
         header {
             text-align: center;
-            padding: 50px 20px;
+            padding: 60px 20px;
         }
 
         .logo {
-            font-size: clamp(40px, 10vw, 70px);
+            font-size: clamp(45px, 10vw, 80px);
             font-weight: 900;
             letter-spacing: -2px;
-            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-shadow: 0 10px 30px rgba(0,0,0,0.6);
         }
 
         .logo span { color: var(--accent-pink); }
@@ -63,52 +68,50 @@
         .motto {
             font-size: clamp(14px, 4vw, 18px);
             opacity: 0.9;
-            letter-spacing: 4px;
+            letter-spacing: 5px;
             text-transform: uppercase;
             margin-top: 10px;
         }
 
         /* ==========================================
-           3. CIHAZA GÖRE DEĞİŞEN OYUN GRİDİ
+           3. CIHAZA ÖZEL OYUN KARTI (PC/MOBILE)
            ========================================== */
         .main-container {
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 30px;
         }
 
         .game-grid {
             display: grid;
-            gap: 30px;
+            gap: 40px;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1000px;
+            grid-template-columns: 1fr; /* Temel mobil düzen */
         }
 
-        /* PC İÇİN (Farklı Görünüş) */
+        /* PC İÇİN ÖZEL YATAY KART */
         @media (min-width: 1025px) {
-            .game-grid { grid-template-columns: repeat(3, 1fr); }
+            .card {
+                flex-direction: row !important;
+                text-align: left !important;
+                justify-content: space-between !important;
+                padding: 40px !important;
+            }
+            .card .card-content { display: flex; flex-direction: column; align-items: flex-start; }
+            .card .icon-container { margin-right: 30px; margin-bottom: 0 !important; }
         }
 
-        /* TABLET İÇİN */
-        @media (min-width: 601px) and (max-width: 1024px) {
-            .game-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        /* TELEFON İÇİN */
-        @media (max-width: 600px) {
-            .game-grid { grid-template-columns: 1fr; }
-        }
-
-        /* OYUN KARTLARI */
+        /* OYUN KARTI TASARIMI */
         .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 35px;
-            padding: 30px;
+            background: rgba(10, 15, 25, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            padding: 35px;
             text-decoration: none;
             color: white;
             text-align: center;
@@ -116,97 +119,136 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
         }
 
         .card:hover {
-            transform: translateY(-15px) scale(1.05);
-            border-color: var(--accent-pink);
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            transform: translateY(-20px) scale(1.05);
+            border-color: var(--accent-green);
+            background: rgba(15, 20, 30, 0.95);
+            box-shadow: 0 30px 60px rgba(76, 175, 80, 0.4);
         }
 
-        .icon { font-size: 60px; margin-bottom: 20px; }
+        .icon-container {
+            width: 100px;
+            height: 100px;
+            border-radius: 25px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            border: 3px solid rgba(255,255,255,0.1);
+            transition: 0.3s;
+        }
 
-        .title { font-size: 26px; font-weight: 800; margin-bottom: 10px; }
+        .card:hover .icon-container { border-color: var(--accent-green); }
 
-        .desc { font-size: 15px; opacity: 0.8; line-height: 1.6; }
+        .game-icon {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            image-rendering: pixelated; /* Piksel keskinliği */
+        }
+
+        /* İkon yoksa gösterilecek yedek piksel ikon */
+        .fallback-icon { font-size: 60px; }
+
+        .card-content { flex: 1; }
+
+        .title { font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+
+        .desc { font-size: 16px; opacity: 0.8; line-height: 1.7; max-width: 500px; }
+
+        .badge-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* PC'de sola yasla */
+        @media (min-width: 1025px) { .badge-container { justify-content: flex-start; } }
 
         .badge {
-            margin-top: 20px;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 13px;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 14px;
             font-weight: bold;
-            background: var(--accent-pink);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* Phobia Web Ed. İndikatörü */
-        .web-edition {
-            background: var(--accent-green) !important;
-            box-shadow: 0 0 15px var(--accent-green);
+        .badge.web {
+            background: var(--accent-green);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+        }
+
+        .badge.store {
+            background: #2196F3;
+            box-shadow: 0 0 15px rgba(33, 150, 243, 0.5);
         }
 
         /* ==========================================
            4. FOOTER VE DURUM ÇUBUĞU
            ========================================== */
         footer {
-            padding: 40px;
+            padding: 50px;
             text-align: center;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.4);
             font-size: 14px;
             opacity: 0.7;
+            margin-top: auto;
         }
 
-        #device-info {
+        #system-status {
             position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.5);
-            padding: 5px 15px;
-            border-radius: 15px;
+            bottom: 25px;
+            left: 25px;
+            background: rgba(0,0,0,0.6);
+            padding: 7px 18px;
+            border-radius: 20px;
             font-size: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
     </style>
 </head>
 <body id="body">
 
-    <canvas id="skyCanvas"></canvas>
+    <canvas id="pixelSkyCanvas"></canvas>
 
     <header>
         <div class="logo">SANU<span>GAME</span></div>
-        <div class="motto">Professional Game Studio</div>
+        <div class="motto">Professional High-End Pixel Studio</div>
     </header>
 
     <div class="main-container">
         <div class="game-grid">
             
             <a href="phobia_web/index.html" class="card">
-                <div class="icon">👁️</div>
-                <div class="title">Phobia</div>
-                <div class="desc">Korkularının derinliğine inmeye hazır mısın? Sadece Web versiyonu aktiftir.</div>
-                <div class="badge web-edition">WEB VERSION ACTIVE</div>
+                <div class="icon-container">
+                    <img src="phobia_web/icon.png" alt="👁️" class="game-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="fallback-icon" style="display:none;">👁️</div>
+                </div>
+                
+                <div class="card-content">
+                    <div class="title">Phobia</div>
+                    <div class="desc">Korkularınla yüzleşmeye hazır mısın? Efsanevi WebGL gerilim deneyimi. Sadece web versiyonu aktiftir.</div>
+                    
+                    <div class="badge-container">
+                        <div class="badge web">🌐 WEB VERSION</div>
+                        <div class="badge store">🤖 PLAY STORE</div>
+                        <div class="badge store">🍏 APP STORE</div>
+                    </div>
+                </div>
             </a>
 
-            <div class="card" style="opacity: 0.7; cursor: not-allowed;">
-                <div class="icon" id="cosmic-icon">🚀</div>
-                <div class="title">Cosmic Run</div>
-                <div class="desc">Sadece mobil cihazlarda oynanabilir. Çok yakında web mağazasında.</div>
-                <div class="badge" style="background:#555;">MOBILE ONLY</div>
             </div>
-
-            <div class="card" style="opacity: 0.7; cursor: not-allowed;">
-                <div class="icon">🍬</div>
-                <div class="title">Sanu Candy</div>
-                <div class="desc">Efsanevi yumak birleştirme motoru. Mobil uygulama olarak yayında.</div>
-                <div class="badge" style="background:#555;">COMING TO WEB</div>
-            </div>
-
-        </div>
     </div>
 
-    <div id="device-info">Yükleniyor...</div>
+    <div id="system-status">Sistem Yükleniyor...</div>
 
     <footer>
         &copy; 2026 Sanu Game Company. Tüm Hakları Saklıdır.<br>
@@ -215,10 +257,10 @@
 
     <script>
         /* ==========================================================================
-           5. GERÇEKÇİ ZAMAN VE GÖKYÜZÜ MOTORU
+           5. HIGH-END PIXEL ART GÖKYÜZÜ MOTORU
            ========================================================================== */
         
-        const canvas = document.getElementById("skyCanvas");
+        const canvas = document.getElementById("pixelSkyCanvas");
         const ctx = canvas.getContext("2d");
         let width, height;
 
@@ -232,23 +274,35 @@
         const hour = new Date().getHours();
         const isDay = hour >= 6 && hour < 18;
 
-        // Gökyüzü Elemanları
         const stars = [];
-        const clouds = [];
         const meteors = [];
+        const clouds = [];
 
-        // Başlatma
-        for(let i=0; i<100; i++) {
-            stars.push({x: Math.random()*width, y: Math.random()*height, s: Math.random()*2, a: Math.random()});
-        }
-        for(let i=0; i<5; i++) {
-            clouds.push({x: Math.random()*width, y: Math.random()*height/2, s: Math.random()*2+1});
+        // Gündüz Başlatma
+        if(isDay) {
+            for(let i=0; i<8; i++) {
+                clouds.push({
+                    x: Math.random()*width, 
+                    y: Math.random()*height/2, 
+                    w: Math.random()*60+40, 
+                    h: Math.random()*20+15,
+                    speed: Math.random()*0.3+0.1
+                });
+            }
+        } else {
+            // Gece Başlatma
+            for(let i=0; i<120; i++) {
+                stars.push({x: Math.random()*width, y: Math.random()*height, s: Math.random()*2+1, a: Math.random()});
+            }
         }
 
-        function drawSky() {
+        // Piksel Blok Çizme
+        function pBlock(x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(Math.floor(x), Math.floor(y), w, h); }
+
+        function drawPixelSky() {
             ctx.clearRect(0,0,width,height);
             
-            // Arka Plan Gradyanı
+            // Arka Plan Radyan Gradyan
             let grd = ctx.createLinearGradient(0, 0, 0, height);
             if(isDay) {
                 grd.addColorStop(0, "#4facfe"); grd.addColorStop(1, "#00f2fe");
@@ -261,78 +315,83 @@
             ctx.fillRect(0,0,width,height);
 
             if(isDay) {
-                // GÜNEŞ
-                ctx.fillStyle = "#FFEA00";
-                ctx.shadowBlur = 50; ctx.shadowColor = "#FFEA00";
-                ctx.beginPath(); ctx.arc(width-100, 100, 40, 0, Math.PI*2); ctx.fill();
-                ctx.shadowBlur = 0;
+                // HIGH-END PİKSEL GÜNEŞ
+                pBlock(width-120, 100, 50, 50, "#FFD700");
+                pBlock(width-130, 110, 70, 30, "#FFD700");
+                pBlock(width-110, 90, 30, 70, "#FFD700");
+                pBlock(width-115, 105, 40, 40, "#FFF"); // Parlama
 
-                // BULUTLAR
-                ctx.fillStyle = "rgba(255,255,255,0.5)";
+                // PİKSEL BULUTLAR
+                ctx.fillStyle = "rgba(255,255,255,0.6)";
                 clouds.forEach(c => {
-                    ctx.beginPath();
-                    ctx.arc(c.x, c.y, 30*c.s, 0, Math.PI*2);
-                    ctx.arc(c.x+20, c.y-10, 25*c.s, 0, Math.PI*2);
-                    ctx.arc(c.x+40, c.y, 30*c.s, 0, Math.PI*2);
-                    ctx.fill();
-                    c.x += 0.5 * c.s;
+                    pBlock(c.x, c.y, c.w, c.h, "rgba(255,255,255,0.7)");
+                    pBlock(c.x+10, c.y-10, c.w-20, 10, "rgba(255,255,255,0.7)");
+                    pBlock(c.x+15, c.y-15, c.w-30, 5, "rgba(255,255,255,0.7)");
+                    c.x += c.speed;
                     if(c.x > width + 100) c.x = -100;
                 });
             } else {
-                // AY
-                ctx.fillStyle = "#DDD";
-                ctx.shadowBlur = 30; ctx.shadowColor = "#FFF";
-                ctx.beginPath(); ctx.arc(width-100, 100, 35, 0, Math.PI*2); ctx.fill();
-                ctx.shadowBlur = 0;
+                // HIGH-END PİKSEL AY
+                pBlock(width-120, 100, 40, 60, "#DDD");
+                pBlock(width-100, 110, 40, 40, "#DDD");
+                // Kraterler
+                pBlock(width-100, 115, 10, 10, "#AAA");
+                pBlock(width-90, 130, 8, 8, "#AAA");
 
                 // YILDIZLAR
                 stars.forEach(s => {
-                    s.a += 0.02;
+                    s.a += 0.03;
                     ctx.fillStyle = `rgba(255,255,255,${Math.abs(Math.sin(s.a))})`;
-                    ctx.fillRect(s.x, s.y, s.s, s.s);
+                    pBlock(s.x, s.y, s.s, s.s, ctx.fillStyle);
                 });
 
-                // METEOR YAĞMURU
-                if(Math.random() < 0.02) {
-                    meteors.push({x: Math.random()*width, y: 0, s: Math.random()*5+2});
+                // DETAYLI PİKSEL METEOR YAĞMURU
+                if(Math.random() < 0.03) {
+                    meteors.push({x: Math.random()*width, y: -50, s: Math.random()*6+4});
                 }
-                ctx.strokeStyle = "white";
                 meteors.forEach((m, i) => {
-                    ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(m.x-20, m.y+20); ctx.stroke();
+                    // Çekirdek
+                    pBlock(m.x, m.y, 10, 10, "#FF5252");
+                    // İz
+                    ctx.fillStyle = "#FF9800";
+                    pBlock(m.x+8, m.y-8, 6, 6, "#FF9800");
+                    pBlock(m.x+14, m.y-14, 4, 4, "#FFF");
+                    
                     m.x -= m.s; m.y += m.s;
-                    if(m.y > height) meteors.splice(i, 1);
+                    if(m.y > height + 50) meteors.splice(i, 1);
                 });
             }
-            requestAnimationFrame(drawSky);
+            requestAnimationFrame(drawPixelSky);
         }
 
         /* ==========================================================================
-           6. CIHAZ TANIMA VE HATA DÜZELTME
+           6. CIHAZ VE SİSTEM TANIMA
            ========================================================================== */
-        function detectDevice() {
+        function detectDeviceAndSystem() {
             const ua = navigator.userAgent;
-            const info = document.getElementById("device-info");
-            let deviceType = "PC / Desktop";
+            const status = document.getElementById("system-status");
+            let device = "PC / Desktop";
+            let os = "Web Browser";
 
-            if (/tablet|ipad|playbook|silk/i.test(ua)) {
-                deviceType = "Tablet";
-            } else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Opera Mini/i.test(ua)) {
-                deviceType = "Phone / Mobile";
-            }
+            if (/tablet|ipad|playbook|silk/i.test(ua)) { device = "Tablet"; }
+            else if (/Mobile|Android|iP(hone|od)/i.test(ua)) { device = "Mobile"; }
 
-            info.innerHTML = `Sistem: ${deviceType} | Mod: ${isDay ? 'Gündüz' : 'Gece'}`;
+            if (/Android/i.test(ua)) { os = "Android OS"; }
+            else if (/iPhone|iPad|iPod/i.test(ua)) { os = "iOS System"; }
+            else if (/Windows/i.test(ua)) { os = "Windows OS"; }
+            else if (/Mac/i.test(ua)) { os = "macOS"; }
+
+            status.innerHTML = `Cihaz: ${device} | OS: ${os} | Mod: ${isDay ? 'Day' : 'Night'}`;
         }
 
         // Tıklama Titreşimi
-        document.querySelectorAll('.card').forEach(card => {
-            card.addEventListener('click', () => {
-                if (navigator.vibrate) navigator.vibrate(50);
-            });
+        document.querySelector('.card').addEventListener('click', () => {
+            if (navigator.vibrate) navigator.vibrate(50);
         });
 
         // Başlat
-        detectDevice();
-        drawSky();
+        detectDeviceAndSystem();
+        drawPixelSky();
     </script>
 </body>
 </html>
